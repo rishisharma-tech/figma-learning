@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Filter Panel — Prototype</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Roboto', sans-serif;
+      background: #EBEBEB;
+      color: #1a1a1a;
+      min-height: 100vh;
+      padding: 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 40px;
+    }
+
+    /* ── Section label ── */
+    .section {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .section-label {
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      color: #80868b;
+      text-transform: uppercase;
+    }
+
+    /* ── Panel shell ── */
+    .panel {
+      width: 280px;
+      background: #fff;
+      border-radius: 10px;
+      border: 1px solid #dadce0;
+      overflow: hidden;
+    }
+
+    .panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 14px 10px;
+    }
+    .panel-title { font-size: 15px; font-weight: 500; color: #1a1a1a; }
+    .panel-clear { font-size: 13px; color: #1a73e8; cursor: pointer; font-weight: 500; }
+    .panel-clear:hover { text-decoration: underline; }
+
+    /* ── Search ── */
+    .fp-search {
+      display: flex; align-items: center; gap: 8px;
+      border: 1px solid #dadce0; border-radius: 8px;
+      padding: 0 12px; height: 40px; margin: 0 12px 10px;
+    }
+    .fp-search svg { width: 15px; height: 15px; stroke: #80868b; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
+    .fp-search input { border: none; outline: none; font-family: 'Roboto', sans-serif; font-size: 14px; color: #1a1a1a; background: transparent; width: 100%; }
+    .fp-search input::placeholder { color: #9aa0a6; }
+
+    /* ── Filter list ── */
+    .fp-filters { display: flex; flex-direction: column; gap: 6px; padding: 0 12px 14px; }
+
+    /* ── Base filter row — EMPTY ── */
+    .fr {
+      border-radius: 8px;
+      border: 1px solid #dadce0;
+      background: #fff;
+      cursor: pointer;
+      overflow: hidden;
+      transition: border-color 0.15s;
+    }
+    .fr:hover:not(.chip):not(.fr-open) { border-color: #adb5bd; }
+
+    .fr-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 12px; height: 44px; gap: 8px;
+    }
+    .fr-label { font-size: 14px; color: #3c4043; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .fr-chev svg {
+      width: 16px; height: 16px; stroke: #80868b; fill: none;
+      stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; display: block;
+      transition: transform 0.2s;
+    }
+
+    /* ── FILLED / chip state ── */
+    .fr.chip { border-color: #1a73e8; background: #e8f0fe; }
+    .fr.chip .fr-label { color: #1a73e8; font-weight: 500; }
+    .fr.chip .fr-chev svg { stroke: #1a73e8; }
+    .chip-x {
+      width: 20px; height: 20px; display: flex; align-items: center;
+      justify-content: center; border-radius: 50%; flex-shrink: 0;
+    }
+    .chip-x:hover { background: rgba(26,115,232,0.18); }
+    .chip-x svg { width: 12px; height: 12px; stroke: #1a73e8; fill: none; stroke-width: 2.5; stroke-linecap: round; }
+
+    /* ── OPEN / expanded state ── */
+    .fr.fr-open { border-color: #1a73e8; border-width: 2px; }
+    .fr.fr-open .fr-header { padding: 0 11px; }
+    .fr.fr-open .fr-label { font-size: 12px; color: #1a73e8; font-weight: 500; text-transform: uppercase; letter-spacing: 0.04em; }
+    .fr.fr-open .fr-chev svg { stroke: #1a73e8; transform: rotate(180deg); }
+
+    /* ── Dropdown body ── */
+    .fr-body { display: none; border-top: 1px solid #e8eaed; }
+    .fr.fr-open .fr-body { display: block; }
+
+    .fr-dd-search {
+      display: flex; align-items: center; gap: 6px;
+      margin: 8px 10px; border: 1px solid #dadce0;
+      border-radius: 6px; padding: 0 10px; height: 34px;
+    }
+    .fr-dd-search svg { width: 13px; height: 13px; stroke: #9aa0a6; fill: none; stroke-width: 2; stroke-linecap: round; }
+    .fr-dd-search input { border: none; outline: none; font-family: 'Roboto', sans-serif; font-size: 13px; color: #1a1a1a; background: transparent; width: 100%; }
+    .fr-dd-search input::placeholder { color: #9aa0a6; }
+
+    .cb-list { display: flex; flex-direction: column; }
+    .cb-item { display: flex; align-items: center; gap: 10px; padding: 7px 14px; cursor: pointer; }
+    .cb-item:hover { background: #f1f3f4; }
+    .cb {
+      width: 16px; height: 16px; border-radius: 3px; border: 2px solid #dadce0;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; background: #fff; transition: all 0.1s;
+    }
+    .cb.checked { background: #1a73e8; border-color: #1a73e8; }
+    .cb svg { display: none; width: 10px; height: 10px; stroke: #fff; fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+    .cb.checked svg { display: block; }
+    .cb-label { font-size: 14px; color: #3c4043; }
+
+    .fr-footer {
+      display: flex; justify-content: flex-end;
+      padding: 8px 12px 10px; border-top: 1px solid #f1f3f4; margin-top: 2px;
+    }
+    .apply-btn {
+      background: #1a73e8; color: #fff; font-family: 'Roboto', sans-serif;
+      font-size: 13px; font-weight: 500; padding: 7px 20px;
+      border: none; border-radius: 6px; cursor: pointer;
+    }
+    .apply-btn:hover { background: #1765cc; }
+
+    .fp-see-all { font-size: 13px; color: #1a73e8; font-weight: 500; cursor: pointer; padding: 2px 0; margin: 4px 12px 12px; display: inline-block; }
+    .fp-see-all:hover { text-decoration: underline; }
+
+    /* ── Interactive panel layout ── */
+    .interactive-wrap {
+      display: flex;
+      gap: 48px;
+      align-items: flex-start;
+      flex-wrap: wrap;
+    }
+    .interactive-panel { width: 280px; }
+    .interactive-notes {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      padding-top: 8px;
+    }
+    .note-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      max-width: 280px;
+    }
+    .note-dot {
+      width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin-top: 5px;
+    }
+    .note-dot.empty { background: #dadce0; border: 1.5px solid #9aa0a6; }
+    .note-dot.open { background: #1a73e8; }
+    .note-dot.chip { background: #e8f0fe; border: 1.5px solid #1a73e8; }
+    .note-text { font-size: 13px; color: #5f6368; line-height: 1.5; }
+    .note-text strong { color: #1a1a1a; font-weight: 500; }
+  </style>
+</head>
+<body>
+
+  <!-- ── STATE 1: EMPTY ── -->
+  <div class="section">
+    <div class="section-label">State 1 — Empty (no filters applied)</div>
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title">Filter by</span>
+      </div>
+      <div class="fp-search">
+        <svg viewBox="0 0 18 18"><circle cx="8" cy="8" r="5.5"/><line x1="12.5" y1="12.5" x2="16" y2="16"/></svg>
+        <input type="text" placeholder="Search" />
+      </div>
+      <div class="fp-filters">
+        <div class="fr"><div class="fr-header"><span class="fr-label">Region</span><div class="fr-chev"><svg viewBox="0 0 16 16"><polyline points="3 6 8 11 13 6"/></svg></div></div></div>
+        <div class="fr"><div class="fr-header"><span class="fr-label">Division</span><div class="fr-chev"><svg viewBox="0 0 16 16"><polyline points="3 6 8 11 13 6"/></svg></div></div></div>
+        <div class="fr"><div class="fr-header"><span class="fr-label">City</span><div class="fr-chev"><svg viewBox="0 0 16 16"><polyline points="3 6 8 11 13 6"/></svg></div></div></div>
+        <div class="fr"><div class="fr-header"><span class="fr-label">Zip</span><div class="fr-chev"><svg viewBox="0 0 16 16"><polyline points="3 6 8 11 13 6"/></svg></div></div></div>
+        <div class="fr"><div class="fr-header"><span class="fr-label">Content manager</span><div class="fr-chev"><svg viewBox="0 0 16 16"><polyline points="3 6 8 11 13 6"/></svg></div></div></div>
+        <div class="fr"><div class="fr-header"><span class="fr-label">Social manager</span><div class="fr-chev"><svg viewBox="0 0 16 16"><polyline points="3 6 8 11 13 6"/></svg></div></div></div>
+        <div class="fr"><div class="fr-header"><span class="fr-label">Area code</span><div class="fr-chev"><svg viewBox="0 0 16 16"><polyline points="3 6 8 11 13 6"/></svg></div></div></div>
+        <div class="fr"><div class="fr-header"><span class="fr-label">Last activity</span><div class="fr-chev"><svg viewBox="0 0 16 16"><polyline points="3 6 8 11 13 6"/></svg></div></div></div>
+        <div class="fr"><div class="fr-header"><span class="fr-label">Contact type</span><div class="fr-chev"><svg viewBox="0 0 16 16"><polyline points="3 6 8 11 13 6"/></svg></div></div></div>
+        <div class="fr"><div class="fr-header"><span class="fr-label">Source</span><div class="fr-chev"><svg viewBox="0 0 16 16"><polyline points="3 6 8 11 13 6"/></svg></div></div></div>
+        <div class="fr"><div class="fr-header"><span class="fr-label">Created date</span><div class="fr-chev"><svg viewBox="0 0 16 16"><polyline points="3 6 8 11 13 6"/></svg></div></div></div>
+        <div class="fr"><div class="fr-header"><span class="fr-label">Assisted by</span><div class="fr-chev"><svg viewBox="0 0 16 16"><polyline points="3 6 8 11 13 6"/></svg></div></div></div>
+        <span class="fp-see-all">See all filters</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── STATE 2: OPEN ── -->
+  <div class="section">
+    <div class="section-label">State 2 — Open (dropdown expanded)</div>
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title">Filter by</span>
+      </div>
+      <div class="fp-search">
+        <svg viewBox="0 0 18 18"><circle cx="8" cy="8" r="5.5"/><line x1="12.5" y1="12.5" x2="16" y2="16"/></svg>
+        <input type="text" placeholder="Search" />
+      </div>
+      <div class="fp-filters">
+        <!-- Open filter row -->
+        <div class="fr fr-open">
+          <div class="fr-header">
+            <span class="fr-label">Region</span>
+            <div class="fr-chev"><svg viewBox="0 0 16 16"><polyline points="3 6 8 11 13 6"/></svg></div>
+          </div>
+          <div class="fr-body" style="display:block">
+            <div class="fr-dd-search">
+              <svg viewBox="0 0 16 16"><circle cx="7" cy="7" r="4.5"/><line x1="10.5" y1="10.5" x2="14" y2="14"/></svg>
+              <input type="text" placeholder="Search" />
+            </div>
+            <div class="cb-list">
+              <div class="cb-item"><div class="cb checked"><svg viewBox="0 0 10 10"><polyline points="1.5 5 4 7.5 8.5 2"/></svg></div><span class="cb-label">All</span></div>
+              <div class="cb-item"><div class="cb checked"><svg viewBox="0 0 10 10"><polyline points="1.5 5 4 7.5 8.5 2"/></svg></div><span class="cb-label">Region 1</span></div>
+              <div class="cb-item"><div class="cb checked"><svg viewBox="0 0 10 10"><polyline points="1.5 5 4 7.5 8.5 2"/></svg></div><span class="cb-label">Region 2</span></div>
+              <div class="cb-item"><div class="cb"><svg viewBox="0 0 10 10"><polyline points="1.5 5 4 7.5 8.5 2"/></svg></div><span class="cb-label">Region 3</span></div>
+            </div>
+            <div class="fr-footer">
+              <button class="apply-btn">Apply</button>
+            </div>
+          </div>
+        </div>
+        <div class="fr"><div class="fr-header"><span class="fr-label">Division</span><div class="fr-chev"><svg viewBox="0 0 16 16"><polyline points="3 6 8 11 13 6"/></svg></div></div></div>
+        <div class="fr"><div class="fr-header"><span class="fr-label">City</span><div class="fr-chev"><svg viewBox="0 0 16 16"><polyline points="3 6 8 11 13 6"/></svg></div></div></div>
+        <div class="fr"><div class="fr-header"><span class="fr-label">Zip</span><div class="fr-chev"><svg viewBox="0 0 16 16"><polyline points="3 6 8 11 13 6"/></svg></div></div></div>
+        <div class="fr"><div class="fr-header"><span class="fr-label">Content manager</span><div class="fr-chev"><svg viewBox="0 0 16 16"><polyline points="3 6 8 11 13 6"/></svg></div></div></div>
+        <div class="fr"><div class="fr-header"><span class="fr-label">Social manager</span><div class="fr-chev"><svg viewBox="0 0 16 16"><polyline points="3 6 8 11 13 6"/></svg></div></div></div>
+        <span class="fp-see-all">See all filters</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── STATE 3: FILLED ── -->
+  <div class="section">
+    <div class="section-label">State 3 — Filled (filters applied)</div>
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title">Filter by</span>
+        <span class="panel-clear">Clear</span>
+      </div>
+      <div class="fp-search">
+        <svg viewBox="0 0 18 18"><circle cx="8" cy="8" r="5.5"/><line x1="12.5" y1="12.5" x2="16" y2="16"/></svg>
+        <input type="text" placeholder="Search" />
+      </div>
+      <div class="fp-filters">
+        <div class="fr chip"><div class="fr-header"><span class="fr-label">2 regions</span><div class="chip-x"><svg viewBox="0 0 12 12"><line x1="2" y1="2" x2="10" y2="10"/><line x1="10" y1="2" x2="2" y2="10"/></svg></div></div></div>
+        <div class="fr chip"><div class="fr-header"><span class="fr-label">2 divisions</span><div class="chip-x"><svg viewBox="0 0 12 12"><line x1="2" y1="2" x2="10" y2="10"/><line x1="10" y1="2" x2="2" y2="10"/></svg></div></div></div>
+        <div class="fr chip"><div class="fr-header"><span class="fr-label">3 cities</span><div class="chip-x"><svg viewBox="0 0 12 12"><line x1="2" y1="2" x2="10" y2="10"/><line x1="10" y1="2" x2="2" y2="10"/></svg></div></div></div>
+        <div class="fr chip"><div class="fr-header"><span class="fr-label">Unmapped</span><div class="chip-x"><svg viewBox="0 0 12 12"><line x1="2" y1="2" x2="10" y2="10"/><line x1="10" y1="2" x2="2" y2="10"/></svg></div></div></div>
+        <div class="fr"><div class="fr-header"><span class="fr-label">Content manager</span><div class="fr-chev"><svg viewBox="0 0 16 16"><polyline points="3 6 8 11 13 6"/></svg></div></div></div>
+        <div class="fr chip"><div class="fr-header"><span class="fr-label">3 social managers</span><div class="chip-x"><svg viewBox="0 0 12 12"><line x1="2" y1="2" x2="10" y2="10"/><line x1="10" y1="2" x2="2" y2="10"/></svg></div></div></div>
+        <div class="fr chip"><div class="fr-header"><span class="fr-label">3 area codes</span><div class="chip-x"><svg viewBox="0 0 12 12"><line x1="2" y1="2" x2="10" y2="10"/><line x1="10" y1="2" x2="2" y2="10"/></svg></div></div></div>
+        <div class="fr"><div class="fr-header"><span class="fr-label">Region manager</span><div class="fr-chev"><svg viewBox="0 0 16 16"><polyline points="3 6 8 11 13 6"/></svg></div></div></div>
+        <div class="fr chip"><div class="fr-header"><span class="fr-label">Under Pressure</span><div class="chip-x"><svg viewBox="0 0 12 12"><line x1="2" y1="2" x2="10" y2="10"/><line x1="10" y1="2" x2="2" y2="10"/></svg></div></div></div>
+        <div class="fr chip"><div class="fr-header"><span class="fr-label">2 new alpha beta tests</span><div class="chip-x"><svg viewBox="0 0 12 12"><line x1="2" y1="2" x2="10" y2="10"/><line x1="10" y1="2" x2="2" y2="10"/></svg></div></div></div>
+        <div class="fr chip"><div class="fr-header"><span class="fr-label">3 locations</span><div class="chip-x"><svg viewBox="0 0 12 12"><line x1="2" y1="2" x2="10" y2="10"/><line x1="10" y1="2" x2="2" y2="10"/></svg></div></div></div>
+        <div class="fr"><div class="fr-header"><span class="fr-label">Last activity</span><div class="fr-chev"><svg viewBox="0 0 16 16"><polyline points="3 6 8 11 13 6"/></svg></div></div></div>
+        <span class="fp-see-all">See all filters</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── INTERACTIVE — all states in one ── -->
+  <div class="section">
+    <div class="section-label">Interactive — click to try all states</div>
+    <div class="interactive-wrap">
+      <div class="interactive-panel">
+        <div class="panel" id="live-panel">
+          <div class="panel-header">
+            <span class="panel-title">Filter by</span>
+            <span class="panel-clear" id="live-clear" style="display:none" onclick="clearAll()">Clear</span>
+          </div>
+          <div class="fp-search">
+            <svg viewBox="0 0 18 18"><circle cx="8" cy="8" r="5.5"/><line x1="12.5" y1="12.5" x2="16" y2="16"/></svg>
+            <input type="text" placeholder="Search" id="fp-search-input" oninput="filterRows(this.value)" />
+          </div>
+          <div class="fp-filters" id="live-filters"></div>
+          <span class="fp-see-all">See all filters</span>
+        </div>
+      </div>
+
+      <div class="interactive-notes">
+        <div class="note-item">
+          <div class="note-dot empty"></div>
+          <div class="note-text"><strong>Empty</strong> — no value selected. Grey border, label only.</div>
+        </div>
+        <div class="note-item">
+          <div class="note-dot open"></div>
+          <div class="note-text"><strong>Open</strong> — click a row to expand. Search + checkboxes + Apply button appear.</div>
+        </div>
+        <div class="note-item">
+          <div class="note-dot chip"></div>
+          <div class="note-text"><strong>Filled</strong> — after applying, row becomes a blue chip showing selection count. Hit ✕ to clear.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const FILTERS = [
+      { label: 'Region',          options: ['All', 'Region 1', 'Region 2', 'Region 3', 'Unmapped'] },
+      { label: 'Division',        options: ['Division A', 'Division B', 'Division C'] },
+      { label: 'City',            options: ['San Francisco, CA', 'Los Angeles, CA', 'Austin, TX', 'Nashville, TN', 'Phoenix, AZ'] },
+      { label: 'Zip',             options: ['94102', '90001', '73301', '37201', '85001'] },
+      { label: 'Content manager', options: ['Robin Williams', 'Kelsy Hiltz', 'Savannah'] },
+      { label: 'Social manager',  options: ['Manager A', 'Manager B', 'Manager C'] },
+      { label: 'Area code',       options: ['415', '213', '512', '615', '602'] },
+      { label: 'Region manager',  options: ['Manager 1', 'Manager 2', 'Manager 3'] },
+      { label: 'Last activity',   options: ['Today', 'Last 7 days', 'Last 30 days', 'Last 90 days'] },
+      { label: 'Contact type',    options: ['Lead', 'Customer', 'Prospect', 'Partner'] },
+      { label: 'Experience score',options: ['Promoters', 'Passives', 'Detractors'] },
+      { label: 'Source',          options: ['Web', 'Mobile', 'Email', 'Social', 'Direct'] },
+      { label: 'Created date',    options: ['Today', 'Last 7 days', 'Last 30 days', 'Last year'] },
+      { label: 'Assisted by',     options: ['Robin', 'Savannah', 'Kelsy Hiltz'] },
+    ];
+
+    let selected = {};   // { label: Set of chosen options }
+    let openLabel = null;
+
+    function clearAll() {
+      selected = {};
+      openLabel = null;
+      render();
+    }
+
+    function toggleOpen(label) {
+      openLabel = openLabel === label ? null : label;
+      render();
+    }
+
+    function toggleOption(label, option) {
+      if (!selected[label]) selected[label] = new Set();
+      if (selected[label].has(option)) selected[label].delete(option);
+      else selected[label].add(option);
+      if (selected[label].size === 0) delete selected[label];
+      render(true); // keep open
+    }
+
+    function applyFilter(label) {
+      openLabel = null;
+      render();
+    }
+
+    function clearChip(label, e) {
+      e.stopPropagation();
+      delete selected[label];
+      if (openLabel === label) openLabel = null;
+      render();
+    }
+
+    function filterRows(query) {
+      const q = query.toLowerCase();
+      document.querySelectorAll('#live-filters .fr-row-wrap').forEach(wrap => {
+        const label = wrap.dataset.label.toLowerCase();
+        wrap.style.display = label.includes(q) ? '' : 'none';
+      });
+    }
+
+    function render(keepOpen = false) {
+      const container = document.getElementById('live-filters');
+      const activeCount = Object.keys(selected).length;
+
+      document.getElementById('live-clear').style.display = activeCount > 0 ? 'block' : 'none';
+
+      container.innerHTML = FILTERS.map(f => {
+        const sel = selected[f.label];
+        const hasValue = sel && sel.size > 0;
+        const isOpen = openLabel === f.label;
+
+        if (hasValue) {
+          const count = sel.size;
+          const chipLabel = count === 1 ? [...sel][0] : `${count} ${f.label.toLowerCase()}s`;
+          return `
+            <div class="fr-row-wrap" data-label="${f.label}">
+              <div class="fr chip">
+                <div class="fr-header">
+                  <span class="fr-label">${chipLabel}</span>
+                  <div class="chip-x" onclick="clearChip('${f.label}', event)">
+                    <svg viewBox="0 0 12 12"><line x1="2" y1="2" x2="10" y2="10"/><line x1="10" y1="2" x2="2" y2="10"/></svg>
+                  </div>
+                </div>
+              </div>
+            </div>`;
+        }
+
+        const cbItems = f.options.map(opt => {
+          const checked = sel && sel.has(opt);
+          return `
+            <div class="cb-item" onclick="toggleOption('${f.label}','${opt}')">
+              <div class="cb ${checked ? 'checked' : ''}">
+                <svg viewBox="0 0 10 10"><polyline points="1.5 5 4 7.5 8.5 2"/></svg>
+              </div>
+              <span class="cb-label">${opt}</span>
+            </div>`;
+        }).join('');
+
+        return `
+          <div class="fr-row-wrap" data-label="${f.label}">
+            <div class="fr ${isOpen ? 'fr-open' : ''}" onclick="toggleOpen('${f.label}')">
+              <div class="fr-header">
+                <span class="fr-label">${f.label}</span>
+                <div class="fr-chev"><svg viewBox="0 0 16 16"><polyline points="3 6 8 11 13 6"/></svg></div>
+              </div>
+              <div class="fr-body" style="${isOpen ? 'display:block' : ''}">
+                <div class="fr-dd-search">
+                  <svg viewBox="0 0 16 16"><circle cx="7" cy="7" r="4.5"/><line x1="10.5" y1="10.5" x2="14" y2="14"/></svg>
+                  <input type="text" placeholder="Search" onclick="event.stopPropagation()" />
+                </div>
+                <div class="cb-list">${cbItems}</div>
+                <div class="fr-footer">
+                  <button class="apply-btn" onclick="event.stopPropagation(); applyFilter('${f.label}')">Apply</button>
+                </div>
+              </div>
+            </div>
+          </div>`;
+      }).join('');
+    }
+
+    render();
+  </script>
+</body>
+</html>
