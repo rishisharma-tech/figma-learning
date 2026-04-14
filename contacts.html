@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Contacts — Filter Prototype</title>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Roboto',sans-serif;background:#f1f3f4;color:#1a1a1a;display:flex;height:100vh;overflow:hidden;}
+
+/* ── Rail ── */
+.rail{width:52px;background:#fff;border-right:1px solid #e0e0e0;display:flex;flex-direction:column;align-items:center;padding:10px 0;gap:2px;flex-shrink:0;}
+.rail-logo{width:34px;height:34px;background:#1976d2;border-radius:9px;display:flex;align-items:center;justify-content:center;margin-bottom:8px;}
+.rail-logo svg{width:22px;height:22px;}
+.ri{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#6b7280;}
+.ri:hover{background:#f1f3f4;}
+.ri.active{background:#e8f0fe;color:#1976d2;}
+.ri svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;}
+.rail-spacer{flex:1;}
+
+/* ── Sidebar ── */
+.sidebar{width:200px;background:#fff;border-right:1px solid #e0e0e0;display:flex;flex-direction:column;flex-shrink:0;}
+.sb-title{font-size:16px;font-weight:500;padding:16px 16px 10px;}
+.sb-add{display:flex;align-items:center;gap:8px;padding:8px 16px;cursor:pointer;font-size:13px;color:#3c4043;}
+.sb-add:hover{background:#f1f3f4;}
+.add-circle{width:22px;height:22px;background:#1976d2;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.add-circle svg{width:12px;height:12px;stroke:white;fill:none;stroke-width:2.5;stroke-linecap:round;}
+.sb-item{padding:8px 16px;font-size:13px;color:#3c4043;cursor:pointer;}
+.sb-item:hover{background:#f1f3f4;}
+.sb-item.active{background:#e8f0fe;color:#1976d2;font-weight:500;border-radius:0 20px 20px 0;}
+.sb-group{display:flex;align-items:center;justify-content:space-between;padding:8px 16px;font-size:13px;color:#3c4043;cursor:pointer;}
+.sb-group svg{width:14px;height:14px;stroke:#5f6368;fill:none;stroke-width:2;stroke-linecap:round;}
+
+/* ── Main ── */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0;}
+.topbar{height:52px;background:#fff;border-bottom:1px solid #e0e0e0;display:flex;align-items:center;justify-content:flex-end;padding:0 16px;gap:10px;flex-shrink:0;}
+.tb-plus{width:32px;height:32px;background:#1976d2;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;}
+.tb-plus svg{width:16px;height:16px;stroke:white;fill:none;stroke-width:2.5;stroke-linecap:round;}
+.tb-btn{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;}
+.tb-btn:hover{background:#f1f3f4;}
+.tb-btn svg{width:16px;height:16px;stroke:#5f6368;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+.tb-avatar{width:28px;height:28px;border-radius:50%;background:#ea8600;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;color:white;cursor:pointer;}
+
+/* ── Content ── */
+.content-body{flex:1;display:flex;overflow:hidden;}
+.contacts-area{flex:1;overflow-y:auto;padding:24px 28px;min-width:0;}
+.contacts-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;}
+.contacts-title{font-size:18px;font-weight:500;}
+.hd-actions{display:flex;align-items:center;gap:10px;}
+.btn-more{display:flex;align-items:center;gap:6px;padding:6px 14px;border:1px solid #dadce0;border-radius:6px;background:#fff;font-size:13px;color:#3c4043;cursor:pointer;font-family:inherit;}
+.btn-more:hover{background:#f1f3f4;}
+.btn-more svg{width:14px;height:14px;stroke:#5f6368;fill:none;stroke-width:2;stroke-linecap:round;}
+.btn-filter{width:34px;height:34px;border:1px solid #dadce0;border-radius:6px;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;position:relative;}
+.btn-filter:hover{background:#f1f3f4;}
+.btn-filter.active{background:#e8f0fe;border-color:#1976d2;}
+.btn-filter svg{width:16px;height:16px;stroke:#5f6368;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+.btn-filter.active svg{stroke:#1976d2;}
+.fbadge{position:absolute;top:-7px;right:-7px;background:#1976d2;color:#fff;font-size:10px;font-weight:500;min-width:16px;height:16px;border-radius:8px;display:none;align-items:center;justify-content:center;padding:0 3px;}
+.fbadge.show{display:flex;}
+
+/* ── Table ── */
+.table-wrap{background:#fff;border-radius:8px;border:1px solid #e0e0e0;overflow:hidden;}
+table{width:100%;border-collapse:collapse;}
+thead tr{border-bottom:1px solid #e0e0e0;}
+th{text-align:left;font-size:12px;font-weight:500;color:#5f6368;padding:10px 16px;white-space:nowrap;}
+th svg{width:11px;height:11px;stroke:#9aa0a6;fill:none;stroke-width:2;stroke-linecap:round;margin-left:3px;vertical-align:middle;}
+tbody tr{border-bottom:1px solid #f1f3f4;cursor:pointer;transition:background 0.1s;}
+tbody tr:last-child{border-bottom:none;}
+tbody tr:hover td{background:#f8f9fa;}
+tbody tr.selected td{background:#e8f0fe;}
+td{font-size:13px;color:#3c4043;padding:10px 16px;vertical-align:middle;}
+.td-name{display:flex;align-items:center;gap:6px;}
+.tag-lead{display:inline-flex;align-items:center;gap:3px;background:#e6f4ea;color:#137333;font-size:11px;font-weight:500;padding:2px 7px;border-radius:10px;}
+.tag-lead svg{width:9px;height:9px;stroke:#137333;fill:none;stroke-width:2.5;stroke-linecap:round;}
+.channels{display:flex;align-items:center;gap:4px;}
+.ch svg{width:13px;height:13px;stroke:#9aa0a6;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+.score{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;font-size:12px;font-weight:500;}
+.sg{background:#e6f4ea;color:#137333;}
+.sa{background:#fef3d0;color:#b06000;}
+.sr{background:#fce8e6;color:#c5221f;}
+
+/* ── Filter panel ── */
+.filter-panel{width:0;background:#fff;border-left:1px solid #e0e0e0;overflow:hidden;transition:width 0.22s ease;flex-shrink:0;display:flex;flex-direction:column;}
+.filter-panel.open{width:272px;overflow-y:auto;}
+.fp-inner{width:272px;}
+.fp-head{display:flex;align-items:center;justify-content:space-between;padding:16px 20px 10px;border-bottom:1px solid #eaeaea;position:sticky;top:0;background:#fff;z-index:5;}
+.fp-title{font-size:16px;font-weight:700;color:#212121;letter-spacing:-0.32px;}
+.fp-head-right{display:flex;align-items:center;gap:6px;}
+.fp-clear{font-size:14px;color:#1976d2;cursor:pointer;font-weight:400;display:none;letter-spacing:-0.28px;}
+.fp-clear.show{display:block;}
+.fp-clear:hover{text-decoration:underline;}
+.fp-cbadge{background:#1976d2;color:#fff;font-size:11px;font-weight:500;min-width:18px;height:18px;border-radius:9px;display:none;align-items:center;justify-content:center;padding:0 4px;}
+.fp-cbadge.show{display:inline-flex;}
+.fp-search{display:flex;align-items:center;gap:8px;border:1px solid #dadce0;border-radius:8px;padding:0 12px;height:38px;margin:10px 20px 8px;}
+.fp-search:focus-within{border-color:#1976d2;}
+.fp-search svg{width:14px;height:14px;stroke:#8f8f8f;fill:none;stroke-width:2;stroke-linecap:round;flex-shrink:0;}
+.fp-search input{border:none;outline:none;font-family:inherit;font-size:14px;color:#1a1a1a;background:transparent;width:100%;}
+.fp-search input::placeholder{color:#9aa0a6;}
+.fp-list{display:flex;flex-direction:column;gap:8px;padding:8px 20px 16px;}
+
+/* Filter row */
+.fr{border-radius:8px;border:1px solid #dadce0;background:#fff;cursor:pointer;overflow:hidden;transition:border-color 0.12s;}
+.fr:not(.chip):hover{border-color:#9aa0a6;}
+.fr-hd{display:flex;align-items:center;gap:8px;padding:8px 12px;min-height:44px;}
+.fr-lbl{font-size:14px;color:#80868b;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:400;}
+.fr-chv svg{width:18px;height:18px;stroke:#5f6368;fill:none;stroke-width:2;stroke-linecap:round;display:block;transition:transform 0.18s;}
+
+/* chip */
+.fr.chip{border-color:#dadce0;background:#fff;}
+.fr.chip .fr-hd{padding:6px 12px;min-height:44px;}
+.fr.chip .fr-body-col{display:flex;flex-direction:column;flex:1;min-width:0;justify-content:center;}
+.fr.chip .fr-float-label{font-size:10px;color:#9aa0a6;font-weight:400;margin-bottom:1px;text-transform:uppercase;letter-spacing:0.04em;}
+.fr.chip .fr-lbl{color:#212121;font-weight:400;font-size:14px;}
+.fr.chip .fr-chv svg{stroke:#8f8f8f;}
+.chip-x{width:20px;height:20px;flex-shrink:0;border-radius:50%;display:flex;align-items:center;justify-content:center;}
+.chip-x:hover{background:rgba(0,0,0,0.07);}
+.chip-x svg{width:11px;height:11px;stroke:#8f8f8f;fill:none;stroke-width:2;stroke-linecap:round;}
+
+/* open */
+.fr.is-open:not(.chip){border-color:#1976d2;border-width:2px;}
+.fr.is-open:not(.chip) .fr-hd{padding:6px 11px;min-height:44px;}
+.fr.is-open:not(.chip) .fr-lbl{font-size:12px;color:#1976d2;font-weight:500;text-transform:none;letter-spacing:0;}
+.fr.is-open:not(.chip) .fr-chv svg{stroke:#1976d2;transform:rotate(180deg);}
+.fr-body{display:none;border-top:1px solid #eaeaea;}
+.fr.is-open:not(.chip) .fr-body{display:block;}
+.fr-dd-search{display:flex;align-items:center;gap:6px;margin:7px 9px;border:1px solid #e5e9f0;border-radius:6px;padding:0 9px;height:32px;}
+.fr-dd-search svg{width:12px;height:12px;stroke:#9aa0a6;fill:none;stroke-width:2;stroke-linecap:round;}
+.fr-dd-search input{border:none;outline:none;font-family:inherit;font-size:12px;color:#1a1a1a;background:transparent;width:100%;}
+.cb-list{display:flex;flex-direction:column;}
+.cb-row{display:flex;align-items:center;gap:9px;padding:6px 13px;cursor:pointer;}
+.cb-row:hover{background:#fafbfc;}
+.cb{width:15px;height:15px;border-radius:3px;border:2px solid #e5e9f0;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:#fff;transition:all 0.1s;}
+.cb.on{background:#1976d2;border-color:#1976d2;}
+.cb svg{display:none;width:9px;height:9px;stroke:#fff;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;}
+.cb.on svg{display:block;}
+.cb-lbl{font-size:14px;color:#1a1a1a;}
+.fr-foot{display:flex;justify-content:flex-end;padding:8px 12px;border-top:1px solid #eaeaea;}
+.apply-btn{background:#1976d2;color:#fff;font-family:inherit;font-size:13px;font-weight:500;padding:6px 18px;border:none;border-radius:4px;cursor:pointer;}
+.apply-btn:hover{background:#1565c0;}
+.fp-see-all{font-size:14px;color:#1976d2;font-weight:400;cursor:pointer;padding:4px 0;margin:0 20px 8px;display:inline-block;}
+.fp-see-all:hover{text-decoration:underline;}
+
+/* ── Detail drawer ── */
+.detail-panel{width:0;background:#fff;border-left:1px solid #e0e0e0;overflow:hidden;transition:width 0.22s ease;flex-shrink:0;display:flex;flex-direction:column;}
+.detail-panel.open{width:360px;overflow-y:auto;}
+.dp-inner{width:360px;}
+
+/* shared head */
+.dp-head{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid #eaeaea;position:sticky;top:0;background:#fff;z-index:5;}
+.dp-back{display:flex;align-items:center;gap:6px;font-size:14px;font-weight:500;color:#212121;cursor:pointer;}
+.dp-back svg{width:15px;height:15px;stroke:#212121;fill:none;stroke-width:2;stroke-linecap:round;}
+.dp-link{font-size:13px;color:#1976d2;cursor:pointer;}
+.dp-btn-row{display:flex;gap:8px;}
+.dp-btn{padding:6px 14px;border-radius:4px;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;border:1px solid #dadce0;background:#fff;color:#3c4043;}
+.dp-btn:hover{background:#f1f3f4;}
+.dp-btn.primary{background:#1976d2;color:#fff;border-color:#1976d2;}
+.dp-btn.primary:hover{background:#1565c0;}
+.dp-btn.danger{color:#d93025;border-color:#f5c6c4;}
+.dp-btn.danger:hover{background:#fce8e6;}
+
+/* avatar section */
+.dp-avatar-sec{display:flex;flex-direction:column;align-items:center;padding:20px 16px 14px;border-bottom:1px solid #f1f3f4;}
+.dp-avatar{width:60px;height:60px;border-radius:50%;background:#c8e6c9;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:500;color:#2e7d32;margin-bottom:8px;}
+.dp-name{font-size:15px;font-weight:500;color:#212121;margin-bottom:10px;}
+.dp-action-row{display:flex;gap:14px;}
+.dp-icon-btn{width:30px;height:30px;border-radius:50%;border:1px solid #e0e0e0;display:flex;align-items:center;justify-content:center;cursor:pointer;}
+.dp-icon-btn:hover{background:#f1f3f4;}
+.dp-icon-btn svg{width:14px;height:14px;stroke:#5f6368;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+
+/* ai banner */
+.dp-ai{display:flex;align-items:center;justify-content:space-between;margin:10px 16px;padding:10px 12px;background:#f0f6ff;border-radius:6px;gap:8px;}
+.dp-ai-lbl{font-size:12px;color:#1a1a1a;display:flex;align-items:center;gap:5px;flex:1;min-width:0;}
+.dp-ai-lbl svg{width:14px;height:14px;fill:#1976d2;flex-shrink:0;}
+.dp-gen-btn{background:#1976d2;color:#fff;font-size:11px;font-weight:500;padding:5px 10px;border-radius:4px;border:none;cursor:pointer;white-space:nowrap;font-family:inherit;}
+.dp-gen-btn:hover{background:#1565c0;}
+
+/* section */
+.dp-sec{padding:0 16px;}
+.dp-sec-hd{display:flex;align-items:center;justify-content:space-between;padding:12px 0 6px;}
+.dp-sec-title{font-size:13px;font-weight:500;color:#212121;}
+.dp-sec-icons{display:flex;gap:2px;}
+.dp-si{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;}
+.dp-si:hover{background:#f1f3f4;}
+.dp-si svg{width:13px;height:13px;stroke:#5f6368;fill:none;stroke-width:1.8;stroke-linecap:round;}
+
+/* saved fields */
+.dp-fields{padding:0 0 12px;display:flex;flex-direction:column;gap:12px;}
+.sv-field{display:flex;flex-direction:column;gap:2px;}
+.sv-label{font-size:11px;color:#9aa0a6;font-weight:400;}
+.sv-value{font-size:14px;color:#212121;font-weight:400;}
+.sv-link{font-size:13px;color:#1976d2;cursor:pointer;margin-top:1px;}
+.dp-divider{height:1px;background:#eaeaea;margin:4px 0;}
+.dp-collapse{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;border-top:1px solid #f1f3f4;cursor:pointer;}
+.dp-collapse:hover{background:#fafbfc;}
+.dp-collapse span{font-size:13px;font-weight:500;color:#212121;}
+.dp-collapse svg{width:14px;height:14px;stroke:#9aa0a6;fill:none;stroke-width:2;stroke-linecap:round;}
+
+/* edit fields — floating label inside field */
+.edit-fields{padding:16px;display:flex;flex-direction:column;gap:12px;}
+.ef{display:flex;flex-direction:column;gap:0;}
+.ef>.ef-label{font-size:12px;color:#5f6368;font-weight:400;margin-bottom:4px;}
+.iw{display:flex;align-items:center;gap:8px;border:1px solid #dadce0;border-radius:8px;background:#fff;padding:8px 12px;min-height:56px;transition:border-color 0.15s,background 0.15s;position:relative;}
+.iw:focus-within{border-color:#1a73e8;border-width:2px;padding:7px 11px;background:#f0f6ff;}
+.iw-inner{display:flex;flex-direction:column;flex:1;min-width:0;justify-content:center;}
+.iw-inner .float-label{font-size:11px;color:#5f6368;font-weight:400;line-height:1.3;margin-bottom:2px;transition:color 0.15s;}
+.iw:focus-within .iw-inner .float-label{color:#1a73e8;}
+.iw-inner input,.iw-inner select{border:none;outline:none;font-family:'Roboto',sans-serif;font-size:14px;color:#212121;background:transparent;width:100%;padding:0;}
+.iw svg{width:14px;height:14px;stroke:#9aa0a6;fill:none;stroke-width:1.8;stroke-linecap:round;flex-shrink:0;}
+.iw:focus-within svg{stroke:#1a73e8;}
+.cc-wrap{display:flex;align-items:center;gap:0;border-right:1px solid #e0e0e0;padding-right:10px;margin-right:8px;flex-shrink:0;}
+.cc-wrap select{border:none;outline:none;font-family:'Roboto',sans-serif;font-size:13px;color:#212121;background:transparent;width:44px;padding:0;}
+.cc-wrap svg{width:12px;height:12px;stroke:#9aa0a6;fill:none;stroke-width:2;stroke-linecap:round;}
+.cb-line{display:flex;align-items:flex-start;gap:8px;}
+.cb-line input{width:15px;height:15px;accent-color:#1976d2;margin-top:2px;flex-shrink:0;}
+.cb-line label{font-size:13px;color:#5f6368;line-height:1.5;}
+
+/* dp view toggle */
+.dp-view{display:block;}
+.dp-view.hidden{display:none;}
+
+/* empty state */
+.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 40px;color:#9aa0a6;text-align:center;gap:10px;}
+.empty-state svg{width:40px;height:40px;stroke:#dadce0;fill:none;stroke-width:1.5;stroke-linecap:round;}
+.empty-state p{font-size:14px;}
+</style>
+</head>
+<body>
+
+<!-- Rail -->
+<div class="rail">
+  <div class="rail-logo">
+    <svg viewBox="0 0 36 36" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M25 11.5C25 9.0 23.0 7.0 20.5 7.0C19.2 7.0 18.1 7.5 17.3 8.3L11.5 13.5C10.6 14.3 10.0 15.4 10.0 16.7C10.0 19.1 12.0 21.0 14.5 21.0L16.5 21.0C16.5 21.0 14.0 22.2 13.5 24.5C13.0 26.8 14.5 29.0 16.8 29.3C19.5 29.7 22.0 27.8 22.5 25.0C22.8 23.4 22.2 21.9 21.1 20.8C23.4 20.1 25.0 18.0 25.0 15.5C25.0 14.3 24.6 13.2 23.9 12.3C24.6 12.1 25.0 11.8 25.0 11.5Z" fill="white"/></svg>
+  </div>
+  <div class="ri"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
+  <div class="ri"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div>
+  <div class="ri"><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
+  <div class="ri"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
+  <div class="ri"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
+  <div class="ri"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
+  <div class="ri active"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg></div>
+  <div class="rail-spacer"></div>
+  <div class="ri"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg></div>
+</div>
+
+<!-- Sidebar -->
+<div class="sidebar">
+  <div class="sb-title">Contacts</div>
+  <div class="sb-add"><div class="add-circle"><svg viewBox="0 0 12 12"><line x1="6" y1="2" x2="6" y2="10"/><line x1="2" y1="6" x2="10" y2="6"/></svg></div>Add a contact</div>
+  <div class="sb-item active">All contacts</div>
+  <div class="sb-item">Lists &amp; segments</div>
+  <div class="sb-group">Settings<svg viewBox="0 0 14 14"><polyline points="3 5 7 9 11 5"/></svg></div>
+</div>
+
+<!-- Main -->
+<div class="main">
+  <div class="topbar">
+    <div class="tb-plus"><svg viewBox="0 0 16 16"><line x1="8" y1="3" x2="8" y2="13"/><line x1="3" y1="8" x2="13" y2="8"/></svg></div>
+    <div class="tb-btn"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg></div>
+    <div class="tb-btn"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06-.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg></div>
+    <div class="tb-avatar">RS</div>
+    <div class="tb-btn"><svg viewBox="0 0 20 20"><line x1="3" y1="6" x2="17" y2="6"/><line x1="3" y1="10" x2="17" y2="10"/><line x1="3" y1="14" x2="17" y2="14"/></svg></div>
+  </div>
+
+  <div class="content-body">
+    <!-- Contacts -->
+    <div class="contacts-area">
+      <div class="contacts-hd">
+        <span class="contacts-title" id="contacts-count">262,194 contacts</span>
+        <div class="hd-actions">
+          <button class="btn-more">More<svg viewBox="0 0 14 14"><polyline points="2 5 7 10 12 5"/></svg></button>
+          <div class="btn-filter" id="filter-btn" onclick="toggleFilter()" title="Filters">
+            <svg viewBox="0 0 18 18"><line x1="2" y1="5" x2="16" y2="5"/><line x1="5" y1="9" x2="13" y2="9"/><line x1="7" y1="13" x2="11" y2="13"/></svg>
+            <div class="fbadge" id="fbadge"></div>
+          </div>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr>
+            <th>Contact name<svg viewBox="0 0 12 12"><polyline points="2 4 6 8 10 4"/></svg></th>
+            <th>Channel</th>
+            <th>Experience score<svg viewBox="0 0 12 12"><polyline points="2 4 6 8 10 4"/></svg></th>
+            <th>Location</th>
+            <th>Last activity<svg viewBox="0 0 12 12"><polyline points="2 4 6 8 10 4"/></svg></th>
+          </tr></thead>
+          <tbody id="tbody"></tbody>
+        </table>
+        <div id="empty-msg" class="empty-state" style="display:none">
+          <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+          <p>No contacts match the selected filters</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filter panel -->
+    <div class="filter-panel" id="filter-panel">
+      <div class="fp-inner">
+        <div class="fp-head">
+          <span class="fp-title">Filter by</span>
+          <div class="fp-head-right">
+            <span class="fp-clear" id="fp-clear" onclick="clearAllFilters()">Clear</span>
+            <span class="fp-cbadge" id="fp-cbadge"></span>
+          </div>
+        </div>
+        <div class="fp-search">
+          <svg viewBox="0 0 18 18"><circle cx="8" cy="8" r="5.5"/><line x1="12.5" y1="12.5" x2="16" y2="16"/></svg>
+          <input type="text" placeholder="Search" oninput="filterSearch(this.value)"/>
+        </div>
+        <div class="fp-list" id="fp-list"></div>
+        <span class="fp-see-all">See all filters</span>
+      </div>
+    </div>
+
+    <!-- Detail drawer -->
+    <div class="detail-panel" id="detail-panel">
+      <div class="dp-inner">
+
+        <!-- Quick view -->
+        <div id="dp-quick" class="dp-view">
+          <div class="dp-head">
+            <div class="dp-back" onclick="closeDetail()">
+              <svg viewBox="0 0 16 16"><polyline points="10 3 5 8 10 13"/></svg>
+              Quick view
+            </div>
+            <span class="dp-link">View all details</span>
+          </div>
+          <div class="dp-avatar-sec">
+            <div class="dp-avatar" id="qv-avatar">N</div>
+            <div class="dp-name" id="qv-name">Newnitesh</div>
+            <div class="dp-action-row">
+              <div class="dp-icon-btn"><svg viewBox="0 0 16 16"><polygon points="5 3 13 8 5 13 5 3"/></svg></div>
+              <div class="dp-icon-btn"><svg viewBox="0 0 16 16"><rect x="2" y="3" width="12" height="10" rx="1"/><polyline points="2 3 8 9 14 3"/></svg></div>
+              <div class="dp-icon-btn"><svg viewBox="0 0 16 16"><circle cx="4" cy="8" r="1"/><circle cx="8" cy="8" r="1"/><circle cx="12" cy="8" r="1"/></svg></div>
+            </div>
+          </div>
+          <div class="dp-ai">
+            <div class="dp-ai-lbl">
+              <svg viewBox="0 0 16 16"><path d="M8 1a7 7 0 100 14A7 7 0 008 1zm.75 10.5h-1.5v-5h1.5v5zm0-6.5h-1.5V3.5h1.5V5z"/></svg>
+              Get insights and actions for <b id="qv-ai-name" style="margin-left:3px;font-weight:500;">Newnitesh</b>
+            </div>
+            <button class="dp-gen-btn">Generate summary</button>
+          </div>
+          <div class="dp-sec">
+            <div class="dp-sec-hd">
+              <span class="dp-sec-title">Basic details</span>
+              <div class="dp-sec-icons">
+                <div class="dp-si" onclick="showEdit()" title="Edit"><svg viewBox="0 0 14 14"><path d="M9.5 1.5l3 3L4 13H1v-3L9.5 1.5z"/></svg></div>
+                <div class="dp-si"><svg viewBox="0 0 16 16"><polyline points="3 6 8 11 13 6"/></svg></div>
+              </div>
+            </div>
+            <div class="dp-fields">
+              <div class="sv-field"><div class="sv-label">Email</div><div class="sv-value" id="qv-email">ejsjs@gmail.com</div></div>
+              <div class="sv-field"><div class="sv-label">Location</div><div class="sv-value" id="qv-location">Vignesh</div></div>
+              <div class="sv-field"><div class="sv-label">Contact type</div><div class="sv-value">Customer</div></div>
+              <div class="sv-field">
+                <div class="sv-label">Lists</div>
+                <div class="sv-value">Contact list(25)</div>
+                <span class="sv-link">Add to lists</span>
+              </div>
+              <div class="sv-field"><div class="sv-label">Segments</div><div class="sv-value">Contact segment(14)</div></div>
+              <div class="sv-field"><div class="sv-label">Last activity</div><div class="sv-value">November 12, 2025</div></div>
+              <div class="sv-field"><div class="sv-label">Created on</div><div class="sv-value">June 04, 2025</div></div>
+            </div>
+          </div>
+          <div class="dp-divider"></div>
+          <div class="dp-collapse"><span>Communication preferences</span><svg viewBox="0 0 16 16"><polyline points="3 6 8 11 13 6"/></svg></div>
+          <div class="dp-collapse"><span>Custom fields</span><svg viewBox="0 0 16 16"><polyline points="3 6 8 11 13 6"/></svg></div>
+          <div class="dp-collapse"><span>Tags</span><svg viewBox="0 0 16 16"><polyline points="3 6 8 11 13 6"/></svg></div>
+        </div>
+
+        <!-- Edit view -->
+        <div id="dp-edit" class="dp-view hidden">
+          <div class="dp-head">
+            <div class="dp-back" onclick="showQuick()">
+              <svg viewBox="0 0 16 16"><polyline points="10 3 5 8 10 13"/></svg>
+              Edit details
+            </div>
+            <div class="dp-btn-row">
+              <button class="dp-btn danger">Block</button>
+              <button class="dp-btn primary" onclick="showQuick()">Update</button>
+            </div>
+          </div>
+          <div class="edit-fields">
+
+            <div class="ef">
+              <div class="iw">
+                <div class="iw-inner">
+                  <span class="float-label">Name</span>
+                  <input type="text" id="ed-name" value="Newnitesh"/>
+                </div>
+              </div>
+            </div>
+
+            <div class="ef">
+              <div class="iw">
+                <svg viewBox="0 0 14 14"><rect x="1" y="2" width="12" height="10" rx="1"/><polyline points="1 2 7 8 13 2"/></svg>
+                <div class="iw-inner">
+                  <span class="float-label">Email</span>
+                  <input type="email" id="ed-email" value="ejsjs@gmail.com"/>
+                </div>
+              </div>
+            </div>
+
+            <div class="ef">
+              <div class="iw">
+                <div class="cc-wrap">
+                  <select><option>+1</option><option>+44</option><option>+91</option></select>
+                  <svg viewBox="0 0 10 10"><polyline points="2 4 5 7 8 4"/></svg>
+                </div>
+                <div class="iw-inner">
+                  <span class="float-label">Phone</span>
+                  <input type="tel" value="(800) 700-6503"/>
+                </div>
+              </div>
+            </div>
+
+            <div class="cb-line">
+              <input type="checkbox" id="wa" checked/>
+              <label for="wa">Phone number and WhatsApp number are the same</label>
+            </div>
+
+            <div class="ef">
+              <div class="iw">
+                <svg viewBox="0 0 14 14"><path d="M7 1a4 4 0 00-4 4c0 3 4 8 4 8s4-5 4-8a4 4 0 00-4-4z"/><circle cx="7" cy="5" r="1.5"/></svg>
+                <div class="iw-inner">
+                  <span class="float-label">Location</span>
+                  <input type="text" id="ed-location" value="Vignesh"/>
+                </div>
+              </div>
+            </div>
+
+            <div class="ef">
+              <div class="iw">
+                <div class="iw-inner">
+                  <span class="float-label">List</span>
+                  <input type="text" value="All selected"/>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const CONTACTS = [
+  {name:'Asif Sartaj',tags:[],channels:['phone','email'],score:null,location:'UMKC School of Dentistry 1',date:'Apr 13, 2026',type:'customer',source:'Web',region:'Region 1'},
+  {name:'-',tags:['Lead'],channels:['phone','email','whatsapp'],score:null,location:'Los Angeles, CA',date:'Apr 13, 2026',type:'lead',source:'Social',region:'Region 2'},
+  {name:'Pramod',tags:[],channels:['phone','email'],score:null,location:'100 Feet Road',date:'Apr 13, 2026',type:'customer',source:'Web',region:'Region 1'},
+  {name:'Vikrant',tags:[],channels:['phone','email'],score:null,location:'100 Feet Road',date:'Apr 13, 2026',type:'customer',source:'Mobile',region:'Region 2'},
+  {name:'Vineet',tags:[],channels:['email'],score:null,location:'100 Feet Road',date:'Apr 13, 2026',type:'customer',source:'Web',region:'Region 1'},
+  {name:'Brad',tags:[],channels:['phone','email'],score:null,location:'100 Feet Road - A',date:'Apr 13, 2026',type:'customer',source:'Email',region:'Region 3'},
+  {name:'Birdeye Automation',tags:['Lead'],channels:['phone','email','whatsapp'],score:null,location:'2 locations',date:'Apr 13, 2026',type:'lead',source:'Social',region:'Region 2'},
+  {name:'Tes Test',tags:[],channels:['phone','whatsapp'],score:9,location:'JYSK - Vancouver',date:'Nov 06, 2025',type:'customer',source:'Web',region:'Region 1'},
+  {name:'Asdfdasfs Asf',tags:[],channels:['phone'],score:2,location:'JYSK - Edmonton',date:'Nov 05, 2025',type:'prospect',source:'Direct',region:'Region 3'},
+  {name:'Itavleenkaur Kaur',tags:['Lead'],channels:['phone','email'],score:null,location:'JYSK - Vancouver',date:'Nov 04, 2025',type:'lead',source:'Web',region:'Region 2'},
+  {name:'Sharim Atilano',tags:['Lead'],channels:['email'],score:null,location:'100 Feet Road - A',date:'Apr 13, 2026',type:'lead',source:'Email',region:'Region 1'},
+  {name:'Michelle Valenzuela',tags:['Lead'],channels:['phone','email','whatsapp'],score:null,location:'100 Feet Road - A',date:'Apr 13, 2026',type:'lead',source:'Social',region:'Region 3'},
+  {name:'Syed Ali',tags:['Lead'],channels:['phone','email'],score:null,location:'JYSK - Vancouver',date:'Oct 27, 2025',type:'lead',source:'Web',region:'Region 2'},
+  {name:'Rahul Jain',tags:[],channels:['phone','email','whatsapp'],score:6,location:'3 locations',date:'Aug 15, 2025',type:'customer',source:'Mobile',region:'Region 3'},
+  {name:'Newnitesh',tags:[],channels:['phone'],score:null,location:'Vignesh',date:'Nov 11, 2025',type:'customer',source:'Web',region:'Region 1'},
+];
+
+const FILTERS=[
+  {label:'Region',options:['Region 1','Region 2','Region 3'],fn:(c,s)=>s.has(c.region)},
+  {label:'Division',options:['Division A','Division B','Division C'],fn:()=>false},
+  {label:'City',options:['Los Angeles, CA','JYSK - Vancouver','JYSK - Edmonton','100 Feet Road'],fn:(c,s)=>[...s].some(v=>c.location.includes(v))},
+  {label:'Zip',options:['94102','90001','73301'],fn:()=>false},
+  {label:'Content manager',options:['Robin Williams','Kelsy Hiltz','Savannah'],fn:()=>false},
+  {label:'Social manager',options:['Manager A','Manager B','Manager C'],fn:()=>false},
+  {label:'Area code',options:['415','213','512'],fn:()=>false},
+  {label:'Region manager',options:['Manager 1','Manager 2','Manager 3'],fn:()=>false},
+  {label:'Room custom',options:['Option 1','Option 2'],fn:()=>false},
+  {label:'New alpha beta test',options:['Alpha','Beta'],fn:()=>false},
+  {label:'Custom test',options:['Test A','Test B'],fn:()=>false},
+  {label:'Location',options:['100 Feet Road','JYSK - Edmonton','JYSK - Vancouver'],fn:(c,s)=>[...s].some(v=>c.location.includes(v))},
+  {label:'Last activity',options:['Today','Last 7 days','Last 30 days','Last 90 days'],fn:()=>false},
+  {label:'Contact type',options:['Lead','Customer','Prospect','Partner'],fn:(c,s)=>s.has(c.type.charAt(0).toUpperCase()+c.type.slice(1))},
+  {label:'Experience score',options:['Promoters','Passives','Detractors'],fn:()=>false},
+  {label:'Source',options:['Web','Mobile','Email','Social','Direct'],fn:(c,s)=>s.has(c.source)},
+  {label:'Created date',options:['Today','Last 7 days','Last 30 days','Last year'],fn:()=>false},
+  {label:'Assisted by',options:['Robin','Savannah','Kelsy Hiltz'],fn:()=>false},
+];
+
+let selected={}, openLabel=null, filterOpen=false, searchQ='', activeRowIdx=-1;
+
+function ch(type){
+  const icons={
+    phone:`<svg viewBox="0 0 16 16" width="13" height="13" fill="none" stroke="#9aa0a6" stroke-width="1.8" stroke-linecap="round"><path d="M14 11.5a.9.9 0 01-.27.63l-1.78 1.8a1.4 1.4 0 01-1 .42c-.07 0-.16 0-.25-.02A13.6 13.6 0 013.6 12.4 12.6 12.6 0 011.67 9.3a13.7 13.7 0 01-.37-3.83 1.39 1.39 0 01.4-.98L3.5 2.7a.9.9 0 01.63-.27c.23 0 .44.08.63.23L6.54 4.4c.2.15.3.34.3.57a.9.9 0 01-.28.6l-.73.74c-.04.04-.05.08-.05.14a.6.6 0 00.08.28 7.8 7.8 0 001.44 1.84 7.6 7.6 0 001.84 1.43.63.63 0 00.3.08.2.2 0 00.15-.06l.73-.74a.88.88 0 01.62-.27c.23 0 .42.07.57.2l1.76 1.4c.2.17.3.37.3.6z"/></svg>`,
+    email:`<svg viewBox="0 0 16 16" width="13" height="13" fill="none" stroke="#9aa0a6" stroke-width="1.8" stroke-linecap="round"><rect x="1.5" y="3.5" width="13" height="9" rx="1.5"/><polyline points="1.5 3.5 8 9 14.5 3.5"/></svg>`,
+    whatsapp:`<svg viewBox="0 0 16 16" width="13" height="13" fill="none" stroke="#9aa0a6" stroke-width="1.8" stroke-linecap="round"><path d="M13 3A6.5 6.5 0 002.1 11.5L1 15l3.6-1.1A6.5 6.5 0 1013 3z"/></svg>`,
+  };
+  return `<div class="ch">${icons[type]||''}</div>`;
+}
+
+function renderContacts(){
+  const active=Object.entries(selected).filter(([,s])=>s.size>0);
+  let rows=CONTACTS;
+  if(active.length>0){
+    rows=CONTACTS.filter(c=>active.every(([lbl,sel])=>{
+      const f=FILTERS.find(f=>f.label===lbl);
+      return f?f.fn(c,sel):true;
+    }));
+  }
+  const tbody=document.getElementById('tbody');
+  const empty=document.getElementById('empty-msg');
+  document.getElementById('contacts-count').textContent=rows.length===1?'1 contact':`${rows.length.toLocaleString()} contacts`;
+  if(rows.length===0){tbody.innerHTML='';empty.style.display='flex';}
+  else{
+    empty.style.display='none';
+    tbody.innerHTML=rows.map((c,i)=>{
+      const nm=c.tags.includes('Lead')?`${c.name} <span class="tag-lead"><svg viewBox="0 0 9 9" width="9" height="9"><polyline points="1 4.5 3.5 7 8 2"/></svg> Lead</span>`:c.name;
+      const chs=c.channels.map(ch).join('');
+      const sc=c.score!=null?`<span class="score ${c.score>=7?'sg':c.score>=4?'sa':'sr'}">${c.score}</span>`:'-';
+      const sel=activeRowIdx===i?'selected':'';
+      return `<tr class="${sel}" onclick="openContact(${i})">
+        <td><div class="td-name">${nm}</div></td>
+        <td><div class="channels">${chs}</div></td>
+        <td>${sc}</td>
+        <td>${c.location}</td>
+        <td>${c.date}</td>
+      </tr>`;
+    }).join('');
+  }
+}
+
+function openContact(idx){
+  activeRowIdx=idx;
+  const c=CONTACTS[idx];
+  const initials=c.name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+  document.getElementById('qv-avatar').textContent=initials;
+  document.getElementById('qv-name').textContent=c.name;
+  document.getElementById('qv-ai-name').textContent=c.name;
+  document.getElementById('qv-email').textContent=c.tags.includes('Lead')?`${c.name.toLowerCase().replace(' ','.')}@example.com`:`${c.name.toLowerCase().replace(' ','')}@gmail.com`;
+  document.getElementById('qv-location').textContent=c.location;
+  document.getElementById('ed-name').value=c.name;
+  document.getElementById('ed-email').value=document.getElementById('qv-email').textContent;
+  document.getElementById('ed-location').value=c.location;
+  showQuick();
+  document.getElementById('detail-panel').classList.add('open');
+  // close filter when opening detail
+  if(filterOpen){filterOpen=false;document.getElementById('filter-panel').classList.remove('open');document.getElementById('filter-btn').classList.remove('active');}
+  renderContacts();
+}
+
+function closeDetail(){
+  document.getElementById('detail-panel').classList.remove('open');
+  activeRowIdx=-1;
+  renderContacts();
+}
+
+function showEdit(){
+  document.getElementById('dp-quick').classList.add('hidden');
+  document.getElementById('dp-edit').classList.remove('hidden');
+}
+
+function showQuick(){
+  document.getElementById('dp-edit').classList.add('hidden');
+  document.getElementById('dp-quick').classList.remove('hidden');
+}
+
+function toggleFilter(){
+  filterOpen=!filterOpen;
+  document.getElementById('filter-panel').classList.toggle('open',filterOpen);
+  document.getElementById('filter-btn').classList.toggle('active',filterOpen);
+  if(filterOpen&&activeRowIdx>=0){closeDetail();}
+}
+
+function renderFilters(){
+  const count=Object.values(selected).filter(s=>s.size>0).length;
+  document.getElementById('fbadge').textContent=count;
+  document.getElementById('fbadge').classList.toggle('show',count>0);
+  document.getElementById('fp-clear').classList.toggle('show',count>0);
+  document.getElementById('fp-cbadge').textContent=count;
+  document.getElementById('fp-cbadge').classList.toggle('show',count>0);
+  const q=searchQ.toLowerCase();
+  document.getElementById('fp-list').innerHTML=FILTERS
+    .filter(f=>f.label.toLowerCase().includes(q))
+    .map(f=>{
+      const sel=selected[f.label];
+      const hasVal=sel&&sel.size>0;
+      const isOpen=openLabel===f.label;
+      if(hasVal){
+        const txt=sel.size===1?[...sel][0]:`${sel.size} ${f.label.toLowerCase()}s`;
+        return `<div class="fr chip" data-label="${f.label}">
+          <div class="fr-hd">
+            <div class="fr-body-col">
+              <span class="fr-float-label">${f.label}</span>
+              <span class="fr-lbl">${txt}</span>
+            </div>
+            <div class="chip-x" onclick="clearChip(event,'${f.label}')"><svg viewBox="0 0 11 11"><line x1="1.5" y1="1.5" x2="9.5" y2="9.5"/><line x1="9.5" y1="1.5" x2="1.5" y2="9.5"/></svg></div>
+          </div></div>`;
+      }
+      const cbs=f.options.map(o=>`
+        <div class="cb-row" onclick="toggleOpt(event,'${f.label}','${o}')">
+          <div class="cb ${sel&&sel.has(o)?'on':''}"><svg viewBox="0 0 9 9"><polyline points="1 4.5 3.5 7 8 2"/></svg></div>
+          <span class="cb-lbl">${o}</span>
+        </div>`).join('');
+      return `<div class="fr ${isOpen?'is-open':''}" onclick="toggleOpen(event,'${f.label}')">
+        <div class="fr-hd">
+          <span class="fr-lbl">${f.label}</span>
+          <div class="fr-chv"><svg viewBox="0 0 16 16"><polyline points="3 6 8 11 13 6"/></svg></div>
+        </div>
+        <div class="fr-body">
+          <div class="fr-dd-search">
+            <svg viewBox="0 0 16 16"><circle cx="7" cy="7" r="4.5"/><line x1="10.5" y1="10.5" x2="14" y2="14"/></svg>
+            <input type="text" placeholder="Search" onclick="event.stopPropagation()"/>
+          </div>
+          <div class="cb-list">${cbs}</div>
+          <div class="fr-foot"><button class="apply-btn" onclick="applyFilter(event,'${f.label}')">Apply</button></div>
+        </div></div>`;
+    }).join('');
+}
+
+function toggleOpen(e,label){
+  e.stopPropagation();
+  openLabel=openLabel===label?null:label;
+  renderFilters();
+}
+
+function toggleOpt(e,label,opt){
+  e.stopPropagation();
+  if(!selected[label])selected[label]=new Set();
+  if(selected[label].has(opt))selected[label].delete(opt);
+  else selected[label].add(opt);
+  if(selected[label].size===0)delete selected[label];
+  const cb=e.currentTarget.querySelector('.cb');
+  if(cb)cb.classList.toggle('on',!!(selected[label]&&selected[label].has(opt)));
+}
+
+function applyFilter(e,label){
+  e.stopPropagation();
+  openLabel=null;
+  renderFilters();
+  renderContacts();
+}
+
+function clearChip(e,label){
+  e.stopPropagation();
+  delete selected[label];
+  if(openLabel===label)openLabel=null;
+  renderFilters();
+  renderContacts();
+}
+
+function clearAllFilters(){
+  selected={};openLabel=null;
+  renderFilters();renderContacts();
+}
+
+function filterSearch(v){searchQ=v;renderFilters();}
+
+document.addEventListener('click',e=>{
+  if(!e.target.closest('.fr')&&openLabel){openLabel=null;renderFilters();}
+});
+
+renderContacts();
+renderFilters();
+</script>
+</body>
+</html>
