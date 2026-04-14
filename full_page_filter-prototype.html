@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Contacts — Filter Prototype</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Roboto', sans-serif;
+      background: #f1f3f4;
+      color: #1a1a1a;
+      min-height: 100vh;
+      display: flex;
+      overflow: hidden;
+      height: 100vh;
+    }
+
+    /* ─── Left rail nav ─── */
+    .rail {
+      width: 52px;
+      background: #fff;
+      border-right: 1px solid #e0e0e0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 12px 0;
+      gap: 4px;
+      flex-shrink: 0;
+      z-index: 10;
+    }
+    .rail-logo {
+      width: 32px; height: 32px;
+      background: #1a73e8; border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 8px;
+    }
+    .rail-logo svg { width: 18px; height: 18px; fill: white; }
+    .rail-icon {
+      width: 36px; height: 36px; border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; color: #5f6368;
+    }
+    .rail-icon:hover { background: #f1f3f4; }
+    .rail-icon.active { background: #e8f0fe; color: #1a73e8; }
+    .rail-icon svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+    .rail-spacer { flex: 1; }
+
+    /* ─── Secondary sidebar ─── */
+    .sidebar {
+      width: 200px;
+      background: #fff;
+      border-right: 1px solid #e0e0e0;
+      padding: 16px 0;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+    }
+    .sidebar-title { font-size: 16px; font-weight: 500; padding: 0 16px 12px; }
+    .sidebar-item {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 8px 16px; font-size: 13px; color: #3c4043; cursor: pointer;
+    }
+    .sidebar-item:hover { background: #f1f3f4; }
+    .sidebar-item.active { background: #e8f0fe; color: #1a73e8; font-weight: 500; border-radius: 0 20px 20px 0; }
+    .sidebar-add {
+      display: flex; align-items: center; gap: 8px;
+      padding: 8px 16px; font-size: 13px; color: #3c4043; cursor: pointer; margin-bottom: 8px;
+    }
+    .sidebar-add:hover { background: #f1f3f4; }
+    .add-circle {
+      width: 22px; height: 22px; background: #1a73e8; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .add-circle svg { width: 12px; height: 12px; stroke: white; fill: none; stroke-width: 2.5; stroke-linecap: round; }
+    .sidebar-group {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 8px 16px; font-size: 13px; color: #3c4043; cursor: pointer;
+    }
+    .sidebar-group:hover { background: #f1f3f4; }
+    .sidebar-group svg { width: 14px; height: 14px; stroke: #5f6368; fill: none; stroke-width: 2; stroke-linecap: round; }
+
+    /* ─── Main content area ─── */
+    .main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      min-width: 0;
+    }
+
+    /* Top bar */
+    .topbar {
+      height: 52px;
+      background: #fff;
+      border-bottom: 1px solid #e0e0e0;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding: 0 16px;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+    .topbar-btn {
+      width: 32px; height: 32px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; background: transparent;
+    }
+    .topbar-btn:hover { background: #f1f3f4; }
+    .topbar-btn svg { width: 16px; height: 16px; stroke: #5f6368; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+    .topbar-plus {
+      width: 32px; height: 32px; background: #1a73e8; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center; cursor: pointer;
+    }
+    .topbar-plus svg { width: 16px; height: 16px; stroke: white; fill: none; stroke-width: 2.5; stroke-linecap: round; }
+    .topbar-avatar {
+      width: 28px; height: 28px; border-radius: 50%; background: #ea8600;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 500; color: white; cursor: pointer;
+    }
+    .topbar-menu { cursor: pointer; color: #5f6368; display: flex; align-items: center; }
+    .topbar-menu svg { width: 18px; height: 18px; stroke: #5f6368; fill: none; stroke-width: 2; stroke-linecap: round; }
+
+    /* Content body */
+    .content-body {
+      flex: 1;
+      display: flex;
+      overflow: hidden;
+    }
+
+    /* Contacts area */
+    .contacts-area {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px 28px;
+      min-width: 0;
+    }
+
+    .contacts-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 20px;
+    }
+    .contacts-title { font-size: 18px; font-weight: 500; color: #1a1a1a; }
+    .contacts-actions { display: flex; align-items: center; gap: 10px; }
+
+    .btn-more {
+      display: flex; align-items: center; gap: 6px;
+      padding: 6px 14px; border: 1px solid #dadce0; border-radius: 6px;
+      background: #fff; font-size: 13px; color: #3c4043; cursor: pointer;
+      font-family: 'Roboto', sans-serif;
+    }
+    .btn-more:hover { background: #f1f3f4; }
+    .btn-more svg { width: 14px; height: 14px; stroke: #5f6368; fill: none; stroke-width: 2; stroke-linecap: round; }
+
+    .btn-filter {
+      width: 34px; height: 34px; border: 1px solid #dadce0; border-radius: 6px;
+      background: #fff; cursor: pointer; display: flex; align-items: center;
+      justify-content: center; position: relative;
+    }
+    .btn-filter:hover { background: #f1f3f4; }
+    .btn-filter.active { background: #e8f0fe; border-color: #1a73e8; }
+    .btn-filter svg { width: 16px; height: 16px; stroke: #5f6368; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+    .btn-filter.active svg { stroke: #1a73e8; }
+    .filter-count-badge {
+      position: absolute; top: -7px; right: -7px;
+      background: #1a73e8; color: #fff;
+      font-size: 10px; font-weight: 500;
+      min-width: 16px; height: 16px; border-radius: 8px;
+      display: none; align-items: center; justify-content: center;
+      padding: 0 3px;
+    }
+    .filter-count-badge.show { display: flex; }
+
+    /* Table */
+    .table-wrap { background: #fff; border-radius: 8px; border: 1px solid #e0e0e0; overflow: hidden; }
+    table { width: 100%; border-collapse: collapse; }
+    thead tr { border-bottom: 1px solid #e0e0e0; }
+    th {
+      text-align: left; font-size: 12px; font-weight: 500;
+      color: #5f6368; padding: 10px 16px; background: #fff;
+      white-space: nowrap;
+    }
+    th svg { width: 12px; height: 12px; stroke: #9aa0a6; fill: none; stroke-width: 2; stroke-linecap: round; margin-left: 3px; vertical-align: middle; }
+    tbody tr { border-bottom: 1px solid #f1f3f4; cursor: pointer; }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover td { background: #f8f9fa; }
+    td { font-size: 13px; color: #3c4043; padding: 10px 16px; vertical-align: middle; }
+    .td-name { font-weight: 400; display: flex; align-items: center; gap: 6px; }
+    .tag-lead {
+      display: inline-flex; align-items: center; gap: 3px;
+      background: #e6f4ea; color: #137333;
+      font-size: 11px; font-weight: 500; padding: 2px 7px; border-radius: 10px;
+    }
+    .tag-lead svg { width: 9px; height: 9px; stroke: #137333; fill: none; stroke-width: 2.5; stroke-linecap: round; }
+    .channels { display: flex; align-items: center; gap: 4px; }
+    .ch { width: 16px; height: 16px; display: flex; align-items: center; justify-content: center; }
+    .ch svg { width: 13px; height: 13px; stroke: #9aa0a6; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+    .score-pill {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 24px; height: 24px; border-radius: 50%; font-size: 12px; font-weight: 500;
+    }
+    .score-green { background: #e6f4ea; color: #137333; }
+    .score-amber { background: #fef3d0; color: #b06000; }
+    .score-red { background: #fce8e6; color: #c5221f; }
+
+    /* ─── Filter panel ─── */
+    .filter-panel {
+      width: 0;
+      background: #fff;
+      border-left: 1px solid #e0e0e0;
+      overflow: hidden;
+      transition: width 0.22s ease;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+    }
+    .filter-panel.open { width: 272px; overflow-y: auto; }
+    .filter-inner { width: 272px; padding: 0; }
+
+    .fp-head {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 16px 10px; border-bottom: 1px solid #f1f3f4;
+      position: sticky; top: 0; background: #fff; z-index: 5;
+    }
+    .fp-title { font-size: 15px; font-weight: 500; }
+    .fp-clear { font-size: 13px; color: #1a73e8; cursor: pointer; font-weight: 500; display: none; }
+    .fp-clear.show { display: block; }
+    .fp-clear:hover { text-decoration: underline; }
+
+    .fp-search {
+      display: flex; align-items: center; gap: 8px;
+      border: 1px solid #dadce0; border-radius: 8px;
+      padding: 0 12px; height: 38px; margin: 10px 12px 8px;
+    }
+    .fp-search:focus-within { border-color: #1a73e8; }
+    .fp-search svg { width: 14px; height: 14px; stroke: #80868b; fill: none; stroke-width: 2; stroke-linecap: round; flex-shrink: 0; }
+    .fp-search input { border: none; outline: none; font-family: 'Roboto', sans-serif; font-size: 13px; color: #1a1a1a; background: transparent; width: 100%; }
+    .fp-search input::placeholder { color: #9aa0a6; }
+
+    .fp-list { display: flex; flex-direction: column; gap: 5px; padding: 0 10px 16px; }
+
+    /* filter row */
+    .fr {
+      border-radius: 7px; border: 1px solid #dadce0;
+      background: #fff; cursor: pointer; overflow: hidden;
+      transition: border-color 0.12s;
+    }
+    .fr:not(.chip):hover { border-color: #9aa0a6; }
+
+    .fr-hd {
+      display: flex; align-items: center; gap: 8px;
+      padding: 0 11px; height: 42px;
+    }
+    .fr-lbl { font-size: 13px; color: #3c4043; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .fr-chv svg {
+      width: 15px; height: 15px; stroke: #9aa0a6; fill: none;
+      stroke-width: 2; stroke-linecap: round; display: block;
+      transition: transform 0.18s;
+    }
+
+    /* chip / filled */
+    .fr.chip { border-color: #1a73e8; background: #e8f0fe; }
+    .fr.chip .fr-lbl { color: #1a73e8; font-weight: 500; font-size: 13px; }
+    .fr.chip .fr-chv svg { stroke: #1a73e8; }
+    .chip-x {
+      width: 20px; height: 20px; flex-shrink: 0; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .chip-x:hover { background: rgba(26,115,232,0.15); }
+    .chip-x svg { width: 11px; height: 11px; stroke: #1a73e8; fill: none; stroke-width: 2.5; stroke-linecap: round; }
+
+    /* open */
+    .fr.is-open { border-color: #1a73e8; border-width: 2px; }
+    .fr.is-open .fr-hd { padding: 0 10px; }
+    .fr.is-open .fr-lbl { font-size: 11px; color: #1a73e8; font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; }
+    .fr.is-open .fr-chv svg { stroke: #1a73e8; transform: rotate(180deg); }
+
+    .fr-body { display: none; border-top: 1px solid #e8eaed; }
+    .fr.is-open .fr-body { display: block; }
+
+    .fr-dd-search {
+      display: flex; align-items: center; gap: 6px;
+      margin: 7px 9px; border: 1px solid #dadce0;
+      border-radius: 6px; padding: 0 9px; height: 32px;
+    }
+    .fr-dd-search svg { width: 12px; height: 12px; stroke: #9aa0a6; fill: none; stroke-width: 2; stroke-linecap: round; }
+    .fr-dd-search input { border: none; outline: none; font-family: 'Roboto', sans-serif; font-size: 12px; color: #1a1a1a; background: transparent; width: 100%; }
+    .fr-dd-search input::placeholder { color: #9aa0a6; }
+
+    .cb-list { display: flex; flex-direction: column; }
+    .cb-row { display: flex; align-items: center; gap: 9px; padding: 6px 13px; cursor: pointer; }
+    .cb-row:hover { background: #f1f3f4; }
+    .cb {
+      width: 15px; height: 15px; border-radius: 3px; border: 2px solid #dadce0;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; background: #fff; transition: all 0.1s;
+    }
+    .cb.on { background: #1a73e8; border-color: #1a73e8; }
+    .cb svg { display: none; width: 9px; height: 9px; stroke: #fff; fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+    .cb.on svg { display: block; }
+    .cb-lbl { font-size: 13px; color: #3c4043; }
+
+    .fr-foot {
+      display: flex; justify-content: flex-end;
+      padding: 7px 11px 9px; border-top: 1px solid #f1f3f4;
+      margin-top: 2px;
+    }
+    .apply-btn {
+      background: #1a73e8; color: #fff; font-family: 'Roboto', sans-serif;
+      font-size: 12px; font-weight: 500; padding: 6px 18px;
+      border: none; border-radius: 6px; cursor: pointer;
+    }
+    .apply-btn:hover { background: #1558b0; }
+
+    .fp-see-all {
+      font-size: 13px; color: #1a73e8; font-weight: 500;
+      cursor: pointer; padding: 4px 2px; margin: 2px 10px 4px; display: inline-block;
+    }
+    .fp-see-all:hover { text-decoration: underline; }
+
+    /* empty state */
+    .empty-state {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      padding: 80px 40px; color: #9aa0a6; text-align: center; gap: 10px;
+    }
+    .empty-state svg { width: 40px; height: 40px; stroke: #dadce0; fill: none; stroke-width: 1.5; stroke-linecap: round; }
+    .empty-state p { font-size: 14px; }
+  </style>
+</head>
+<body>
+
+  <!-- Rail nav -->
+  <div class="rail">
+    <div class="rail-logo" style="background:#fff; overflow:hidden;"><img src="data:image/png;base64,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" style="width:32px;height:32px;object-fit:contain;display:block;"/></div>
+    <div class="rail-icon"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
+    <div class="rail-icon"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div>
+    <div class="rail-icon"><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
+    <div class="rail-icon"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
+    <div class="rail-icon"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
+    <div class="rail-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
+    <div class="rail-icon active"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg></div>
+    <div class="rail-spacer"></div>
+    <div class="rail-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06-.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg></div>
+  </div>
+
+  <!-- Secondary sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-title">Contacts</div>
+    <div class="sidebar-add">
+      <div class="add-circle"><svg viewBox="0 0 12 12"><line x1="6" y1="2" x2="6" y2="10"/><line x1="2" y1="6" x2="10" y2="6"/></svg></div>
+      Add a contact
+    </div>
+    <div class="sidebar-item active">All contacts</div>
+    <div class="sidebar-item">Lists &amp; segments</div>
+    <div class="sidebar-group">
+      Settings
+      <svg viewBox="0 0 14 14"><polyline points="3 5 7 9 11 5"/></svg>
+    </div>
+  </div>
+
+  <!-- Main -->
+  <div class="main">
+    <div class="topbar">
+      <div class="topbar-plus"><svg viewBox="0 0 16 16"><line x1="8" y1="3" x2="8" y2="13"/><line x1="3" y1="8" x2="13" y2="8"/></svg></div>
+      <div class="topbar-btn"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg></div>
+      <div class="topbar-btn"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06-.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg></div>
+      <div class="topbar-avatar">RS</div>
+      <div class="topbar-menu"><svg viewBox="0 0 20 20"><line x1="3" y1="6" x2="17" y2="6"/><line x1="3" y1="10" x2="17" y2="10"/><line x1="3" y1="14" x2="17" y2="14"/></svg></div>
+    </div>
+
+    <div class="content-body">
+      <!-- Contacts table -->
+      <div class="contacts-area">
+        <div class="contacts-header">
+          <span class="contacts-title" id="contact-count">262,194 contacts</span>
+          <div class="contacts-actions">
+            <button class="btn-more">More <svg viewBox="0 0 14 14"><polyline points="2 5 7 10 12 5"/></svg></button>
+            <div class="btn-filter" id="filter-toggle-btn" onclick="togglePanel()" title="Toggle filters">
+              <svg viewBox="0 0 18 18"><line x1="2" y1="5" x2="16" y2="5"/><line x1="5" y1="9" x2="13" y2="9"/><line x1="7" y1="13" x2="11" y2="13"/></svg>
+              <div class="filter-count-badge" id="filter-badge">0</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Contact name <svg viewBox="0 0 12 12"><polyline points="2 4 6 8 10 4"/></svg></th>
+                <th>Channel</th>
+                <th>Experience score <svg viewBox="0 0 12 12"><polyline points="2 4 6 8 10 4"/></svg></th>
+                <th>Location</th>
+                <th>Last activity <svg viewBox="0 0 12 12"><polyline points="2 4 6 8 10 4"/></svg></th>
+              </tr>
+            </thead>
+            <tbody id="contacts-tbody"></tbody>
+          </table>
+          <div id="empty-state" class="empty-state" style="display:none">
+            <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+            <p>No contacts match the selected filters</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Filter panel -->
+      <div class="filter-panel" id="filter-panel">
+        <div class="filter-inner">
+          <div class="fp-head">
+            <span class="fp-title">Filter by</span>
+            <span class="fp-clear" id="fp-clear" onclick="clearAll()">Clear</span>
+          </div>
+          <div class="fp-search">
+            <svg viewBox="0 0 18 18"><circle cx="8" cy="8" r="5.5"/><line x1="12.5" y1="12.5" x2="16" y2="16"/></svg>
+            <input type="text" placeholder="Search" oninput="searchFilters(this.value)" />
+          </div>
+          <div class="fp-list" id="fp-list"></div>
+          <span class="fp-see-all">See all filters</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* ── Data ── */
+    const ALL_CONTACTS = [
+      { name: 'Asif Sartaj',        tags: [],       channels: ['phone','email'],         score: null, location: 'UMKC School of Dentistry 1', date: 'Apr 13, 2026', type: 'customer', source: 'Web',    region: 'Region 1' },
+      { name: '-',                   tags: ['Lead'], channels: ['phone','email','whatsapp'],score:null, location: 'Los Angeles, CA',           date: 'Apr 13, 2026', type: 'lead',     source: 'Social', region: 'Region 2' },
+      { name: 'Pramod',              tags: [],       channels: ['phone','email'],         score: null, location: '100 Feet Road',              date: 'Apr 13, 2026', type: 'customer', source: 'Web',    region: 'Region 1' },
+      { name: 'Vikrant',             tags: [],       channels: ['phone','email'],         score: null, location: '100 Feet Road',              date: 'Apr 13, 2026', type: 'customer', source: 'Mobile', region: 'Region 2' },
+      { name: 'Vineet',              tags: [],       channels: ['email'],                 score: null, location: '100 Feet Road',              date: 'Apr 13, 2026', type: 'customer', source: 'Web',    region: 'Region 1' },
+      { name: 'Brad',                tags: [],       channels: ['phone','email'],         score: null, location: '100 Feet Road - A',          date: 'Apr 13, 2026', type: 'customer', source: 'Email',  region: 'Region 3' },
+      { name: 'Birdeye Automation',  tags: ['Lead'], channels: ['phone','email','whatsapp'],score:null, location: '2 locations',               date: 'Apr 13, 2026', type: 'lead',     source: 'Social', region: 'Region 2' },
+      { name: 'Tes Test',            tags: [],       channels: ['phone','whatsapp'],      score: 9,    location: 'JYSK - Vancouver',           date: 'Nov 06, 2025', type: 'customer', source: 'Web',    region: 'Region 1' },
+      { name: 'Asdfdasfs Asf',       tags: [],       channels: ['phone'],                 score: 2,    location: 'JYSK - Edmonton',            date: 'Nov 05, 2025', type: 'prospect', source: 'Direct', region: 'Region 3' },
+      { name: 'Itavleenkaur Kaur',   tags: ['Lead'], channels: ['phone','email'],         score: null, location: 'JYSK - Vancouver',           date: 'Nov 04, 2025', type: 'lead',     source: 'Web',    region: 'Region 2' },
+      { name: 'Sharim Atilano',      tags: ['Lead'], channels: ['email'],                 score: null, location: '100 Feet Road - A',          date: 'Apr 13, 2026', type: 'lead',     source: 'Email',  region: 'Region 1' },
+      { name: 'Michelle Valenzuela', tags: ['Lead'], channels: ['phone','email','whatsapp'],score:null, location: '100 Feet Road - A',         date: 'Apr 13, 2026', type: 'lead',     source: 'Social', region: 'Region 3' },
+      { name: 'Syed Ali',            tags: ['Lead'], channels: ['phone','email'],         score: null, location: 'JYSK - Vancouver',           date: 'Oct 27, 2025', type: 'lead',     source: 'Web',    region: 'Region 2' },
+      { name: 'Asif Sartaj',        tags: ['Lead'], channels: ['phone','email'],         score: null, location: 'JYSK - Edmonton',            date: 'Oct 26, 2025', type: 'lead',     source: 'Web',    region: 'Region 1' },
+      { name: 'Rahul Jain',          tags: [],       channels: ['phone','email','whatsapp'],score: 6,   location: '3 locations',               date: 'Aug 15, 2025', type: 'customer', source: 'Mobile', region: 'Region 3' },
+    ];
+
+    const FILTERS = [
+      { label: 'Region',          options: ['Region 1','Region 2','Region 3'],           filterFn: (c, sel) => sel.has(c.region) },
+      { label: 'Division',        options: ['Division A','Division B','Division C'],      filterFn: (c, sel) => false },
+      { label: 'City',            options: ['Los Angeles, CA','JYSK - Vancouver','JYSK - Edmonton','100 Feet Road'], filterFn: (c, sel) => [...sel].some(s => c.location.includes(s)) },
+      { label: 'Zip',             options: ['94102','90001','73301'],                     filterFn: () => false },
+      { label: 'Content manager', options: ['Robin Williams','Kelsy Hiltz','Savannah'],   filterFn: () => false },
+      { label: 'Social manager',  options: ['Manager A','Manager B','Manager C'],         filterFn: () => false },
+      { label: 'Area code',       options: ['415','213','512'],                           filterFn: () => false },
+      { label: 'Region manager',  options: ['Manager 1','Manager 2','Manager 3'],         filterFn: () => false },
+      { label: 'Room custom',     options: ['Option 1','Option 2'],                       filterFn: () => false },
+      { label: 'New alpha beta test', options: ['Alpha','Beta'],                          filterFn: () => false },
+      { label: 'Custom test',     options: ['Test A','Test B'],                           filterFn: () => false },
+      { label: 'Location',        options: ['100 Feet Road','JYSK - Edmonton','JYSK - Vancouver'], filterFn: (c, sel) => [...sel].some(s => c.location.includes(s)) },
+      { label: 'Last activity',   options: ['Today','Last 7 days','Last 30 days','Last 90 days'], filterFn: () => false },
+      { label: 'Contact type',    options: ['Lead','Customer','Prospect','Partner'],      filterFn: (c, sel) => sel.has(c.type.charAt(0).toUpperCase() + c.type.slice(1)) },
+      { label: 'Experience score',options: ['Promoters','Passives','Detractors'],         filterFn: () => false },
+      { label: 'Source',          options: ['Web','Mobile','Email','Social','Direct'],    filterFn: (c, sel) => sel.has(c.source) },
+      { label: 'Created date',    options: ['Today','Last 7 days','Last 30 days','Last year'], filterFn: () => false },
+      { label: 'Assisted by',     options: ['Robin','Savannah','Kelsy Hiltz'],            filterFn: () => false },
+    ];
+
+    let selected = {};   // { label: Set }
+    let openLabel = null;
+    let panelOpen = false;
+    let searchQuery = '';
+
+    /* ── Toggle panel ── */
+    function togglePanel() {
+      panelOpen = !panelOpen;
+      document.getElementById('filter-panel').classList.toggle('open', panelOpen);
+      document.getElementById('filter-toggle-btn').classList.toggle('active', panelOpen);
+    }
+
+    /* ── Render contacts ── */
+    function renderContacts() {
+      const activeFilters = Object.entries(selected).filter(([, s]) => s.size > 0);
+      let rows = ALL_CONTACTS;
+
+      if (activeFilters.length > 0) {
+        rows = ALL_CONTACTS.filter(c => {
+          return activeFilters.every(([label, sel]) => {
+            const f = FILTERS.find(f => f.label === label);
+            return f ? f.filterFn(c, sel) : true;
+          });
+        });
+      }
+
+      const tbody = document.getElementById('contacts-tbody');
+      const empty = document.getElementById('empty-state');
+
+      document.getElementById('contact-count').textContent =
+        rows.length === 1 ? '1 contact' : `${rows.length.toLocaleString()} contacts`;
+
+      if (rows.length === 0) {
+        tbody.innerHTML = '';
+        empty.style.display = 'flex';
+      } else {
+        empty.style.display = 'none';
+        tbody.innerHTML = rows.map(c => {
+          const namePart = c.tags.includes('Lead')
+            ? `${c.name} <span class="tag-lead"><svg viewBox="0 0 9 9"><polyline points="1 4.5 3.5 7 8 2"/></svg> Lead</span>`
+            : c.name;
+          const channels = c.channels.map(ch => {
+            const icons = {
+              phone: `<svg viewBox="0 0 16 16"><path d="M14 11.5a.9.9 0 01-.27.63l-1.78 1.8a1.4 1.4 0 01-1 .42c-.07 0-.16 0-.25-.02A13.6 13.6 0 013.6 12.4 12.6 12.6 0 011.67 9.3a13.7 13.7 0 01-.37-3.83 1.39 1.39 0 01.4-.98L3.5 2.7a.9.9 0 01.63-.27c.23 0 .44.08.63.23L6.54 4.4c.2.15.3.34.3.57a.9.9 0 01-.28.6l-.73.74c-.04.04-.05.08-.05.14a.6.6 0 00.08.28 7.8 7.8 0 001.44 1.84 7.6 7.6 0 001.84 1.43.63.63 0 00.3.08.2.2 0 00.15-.06l.73-.74a.88.88 0 01.62-.27c.23 0 .42.07.57.2l1.76 1.4c.2.17.3.37.3.6z"/></svg>`,
+              email: `<svg viewBox="0 0 16 16"><rect x="1.5" y="3.5" width="13" height="9" rx="1.5"/><polyline points="1.5 3.5 8 9 14.5 3.5"/></svg>`,
+              whatsapp: `<svg viewBox="0 0 16 16"><path d="M13 3A6.5 6.5 0 002.1 11.5L1 15l3.6-1.1A6.5 6.5 0 1013 3z"/></svg>`,
+            };
+            return `<div class="ch">${icons[ch] || ''}</div>`;
+          }).join('');
+          const scorePart = c.score !== null
+            ? `<span class="score-pill ${c.score >= 7 ? 'score-green' : c.score >= 4 ? 'score-amber' : 'score-red'}">${c.score}</span>`
+            : '-';
+          return `<tr>
+            <td><div class="td-name">${namePart}</div></td>
+            <td><div class="channels">${channels}</div></td>
+            <td>${scorePart}</td>
+            <td>${c.location}</td>
+            <td>${c.date}</td>
+          </tr>`;
+        }).join('');
+      }
+    }
+
+    /* ── Render filter list ── */
+    function renderFilters() {
+      const activeCount = Object.values(selected).filter(s => s.size > 0).length;
+      document.getElementById('filter-badge').textContent = activeCount;
+      document.getElementById('filter-badge').classList.toggle('show', activeCount > 0);
+      document.getElementById('fp-clear').classList.toggle('show', activeCount > 0);
+
+      const q = searchQuery.toLowerCase();
+      const container = document.getElementById('fp-list');
+
+      container.innerHTML = FILTERS
+        .filter(f => f.label.toLowerCase().includes(q))
+        .map(f => {
+          const sel = selected[f.label];
+          const hasVal = sel && sel.size > 0;
+          const isOpen = openLabel === f.label;
+
+          if (hasVal) {
+            const count = sel.size;
+            const chipText = count === 1 ? [...sel][0] : `${count} ${f.label.toLowerCase()}s`;
+            return `<div class="fr chip" data-label="${f.label}">
+              <div class="fr-hd">
+                <span class="fr-lbl">${chipText}</span>
+                <div class="chip-x" onclick="clearChip(event,'${f.label}')">
+                  <svg viewBox="0 0 11 11"><line x1="1.5" y1="1.5" x2="9.5" y2="9.5"/><line x1="9.5" y1="1.5" x2="1.5" y2="9.5"/></svg>
+                </div>
+              </div>
+            </div>`;
+          }
+
+          const cbRows = f.options.map(opt => {
+            const checked = sel && sel.has(opt);
+            return `<div class="cb-row" onclick="toggleOpt(event,'${f.label}','${opt}')">
+              <div class="cb ${checked ? 'on' : ''}"><svg viewBox="0 0 9 9"><polyline points="1 4.5 3.5 7 8 2"/></svg></div>
+              <span class="cb-lbl">${opt}</span>
+            </div>`;
+          }).join('');
+
+          return `<div class="fr ${isOpen ? 'is-open' : ''}" data-label="${f.label}" onclick="toggleOpen(event,'${f.label}')">
+            <div class="fr-hd">
+              <span class="fr-lbl">${f.label}</span>
+              <div class="fr-chv"><svg viewBox="0 0 15 15"><polyline points="3 5.5 7.5 10 12 5.5"/></svg></div>
+            </div>
+            <div class="fr-body">
+              <div class="fr-dd-search">
+                <svg viewBox="0 0 16 16"><circle cx="7" cy="7" r="4.5"/><line x1="10.5" y1="10.5" x2="14" y2="14"/></svg>
+                <input type="text" placeholder="Search" onclick="event.stopPropagation()" />
+              </div>
+              <div class="cb-list">${cbRows}</div>
+              <div class="fr-foot">
+                <button class="apply-btn" onclick="applyFilter(event,'${f.label}')">Apply</button>
+              </div>
+            </div>
+          </div>`;
+        }).join('');
+    }
+
+    /* ── Interactions ── */
+    function toggleOpen(e, label) {
+      e.stopPropagation();
+      // If clicked on the header of an open row, close it
+      if (openLabel === label) { openLabel = null; }
+      else { openLabel = label; }
+      renderFilters();
+    }
+
+    function toggleOpt(e, label, opt) {
+      e.stopPropagation();
+      if (!selected[label]) selected[label] = new Set();
+      if (selected[label].has(opt)) selected[label].delete(opt);
+      else selected[label].add(opt);
+      if (selected[label].size === 0) delete selected[label];
+      // Only update checkbox in-place, no full re-render
+      const cb = e.currentTarget.querySelector('.cb');
+      if (cb) cb.classList.toggle('on', !!(selected[label] && selected[label].has(opt)));
+    }
+
+    function applyFilter(e, label) {
+      e.stopPropagation();
+      openLabel = null;
+      renderFilters();
+      renderContacts();
+    }
+
+    function clearChip(e, label) {
+      e.stopPropagation();
+      delete selected[label];
+      if (openLabel === label) openLabel = null;
+      renderFilters();
+      renderContacts();
+    }
+
+    function clearAll() {
+      selected = {};
+      openLabel = null;
+      renderFilters();
+      renderContacts();
+    }
+
+    function searchFilters(val) {
+      searchQuery = val;
+      renderFilters();
+    }
+
+    /* Close open dropdown when clicking outside */
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.fr') && openLabel) {
+        openLabel = null;
+        renderFilters();
+      }
+    });
+
+    /* Init */
+    renderContacts();
+    renderFilters();
+  </script>
+</body>
+</html>
