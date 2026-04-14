@@ -221,58 +221,58 @@
 
     .fp-head {
       display: flex; align-items: center; justify-content: space-between;
-      padding: 14px 16px 10px; border-bottom: 1px solid #f1f3f4;
+      padding: 16px 20px; border-bottom: 1px solid #eaeaea;
       position: sticky; top: 0; background: #fff; z-index: 5;
     }
-    .fp-title { font-size: 15px; font-weight: 500; }
-    .fp-clear { font-size: 13px; color: #1a73e8; cursor: pointer; font-weight: 500; display: none; }
+    .fp-title { font-size: 16px; font-weight: 700; color: #212121; letter-spacing: -0.32px; }
+    .fp-clear { font-size: 14px; color: #1976d2; cursor: pointer; font-weight: 400; display: none; letter-spacing: -0.28px; }
     .fp-clear.show { display: block; }
     .fp-clear:hover { text-decoration: underline; }
 
     .fp-search {
       display: flex; align-items: center; gap: 8px;
       border: 1px solid #dadce0; border-radius: 8px;
-      padding: 0 12px; height: 38px; margin: 10px 12px 8px;
+      padding: 0 12px; height: 38px; margin: 10px 20px 8px;
     }
     .fp-search:focus-within { border-color: #1a73e8; }
-    .fp-search svg { width: 14px; height: 14px; stroke: #80868b; fill: none; stroke-width: 2; stroke-linecap: round; flex-shrink: 0; }
-    .fp-search input { border: none; outline: none; font-family: 'Roboto', sans-serif; font-size: 13px; color: #1a1a1a; background: transparent; width: 100%; }
+    .fp-search svg { width: 14px; height: 14px; stroke: #8f8f8f; fill: none; stroke-width: 2; stroke-linecap: round; flex-shrink: 0; }
+    .fp-search input { border: none; outline: none; font-family: 'Roboto', sans-serif; font-size: 14px; color: #1a1a1a; background: transparent; width: 100%; }
     .fp-search input::placeholder { color: #9aa0a6; }
 
-    .fp-list { display: flex; flex-direction: column; gap: 5px; padding: 0 10px 16px; }
+    .fp-list { display: flex; flex-direction: column; gap: 10px; padding: 8px 20px 16px; }
 
     /* filter row */
     .fr {
-      border-radius: 7px; border: 1px solid #dadce0;
+      border-radius: 8px; border: 1px solid #dadce0;
       background: #fff; cursor: pointer; overflow: hidden;
-      transition: border-color 0.12s;
+      transition: border-color 0.15s;
     }
     .fr:not(.chip):hover { border-color: #9aa0a6; }
 
     .fr-hd {
       display: flex; align-items: center; gap: 8px;
-      padding: 0 11px; height: 42px;
+      padding: 8px 12px; min-height: 44px;
     }
-    .fr-lbl { font-size: 13px; color: #3c4043; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .fr-lbl { font-size: 14px; color: #80868b; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 400; }
     .fr-chv svg {
-      width: 15px; height: 15px; stroke: #9aa0a6; fill: none;
+      width: 18px; height: 18px; stroke: #5f6368; fill: none;
       stroke-width: 2; stroke-linecap: round; display: block;
       transition: transform 0.18s;
     }
 
-    /* chip / filled */
-    .fr.chip { border-color: #1a73e8; border-width: 2px; background: #e8f0fe; }
-    .fr.chip .fr-hd { padding: 6px 10px; height: auto; min-height: 48px; align-items: center; }
-    .fr.chip .fr-body-col { display: flex; flex-direction: column; flex: 1; min-width: 0; }
-    .fr.chip .fr-float-label { font-size: 11px; color: #1a73e8; font-weight: 500; margin-bottom: 1px; }
-    .fr.chip .fr-lbl { color: #1d4ed8; font-weight: 500; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .fr.chip .fr-chv svg { stroke: #1a73e8; }
+    /* chip / filled — matches "filled" input field style exactly */
+    .fr.chip { border-color: #dadce0; border-width: 1px; background: #fff; }
+    .fr.chip .fr-hd { padding: 6px 12px; height: auto; min-height: 44px; align-items: center; }
+    .fr.chip .fr-body-col { display: flex; flex-direction: column; flex: 1; min-width: 0; justify-content: center; }
+    .fr.chip .fr-float-label { font-size: 12px; color: #5f6368; font-weight: 400; margin-bottom: 2px; line-height: 1.3; }
+    .fr.chip .fr-lbl { color: #1a1a1a; font-weight: 400; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.4; }
+    .fr.chip .fr-chv svg { stroke: #5f6368; }
     .chip-x {
-      width: 20px; height: 20px; flex-shrink: 0; border-radius: 50%;
+      width: 24px; height: 24px; flex-shrink: 0; border-radius: 50%;
       display: flex; align-items: center; justify-content: center;
     }
-    .chip-x:hover { background: rgba(26,115,232,0.15); }
-    .chip-x svg { width: 11px; height: 11px; stroke: #1a73e8; fill: none; stroke-width: 2.5; stroke-linecap: round; }
+    .chip-x:hover { background: rgba(0,0,0,0.07); }
+    .chip-x svg { width: 13px; height: 13px; stroke: #5f6368; fill: none; stroke-width: 2; stroke-linecap: round; }
 
     /* open */
     .fr.is-open { border-color: #1a73e8; border-width: 2px; }
@@ -280,13 +280,13 @@
     .fr.is-open .fr-lbl { font-size: 11px; color: #1a73e8; font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; }
     .fr.is-open .fr-chv svg { stroke: #1a73e8; transform: rotate(180deg); }
 
-    .fr-body { display: none; border-top: 1px solid #e8eaed; }
+    .fr-body { display: none; border-top: 1px solid #dadce0; }
     .fr.is-open .fr-body { display: block; }
 
     .fr-dd-search {
       display: flex; align-items: center; gap: 6px;
-      margin: 7px 9px; border: 1px solid #dadce0;
-      border-radius: 6px; padding: 0 9px; height: 32px;
+      margin: 6px 8px; border: 1px solid #e5e9f0;
+      border-radius: 4px; padding: 0 9px; height: 32px;
     }
     .fr-dd-search svg { width: 12px; height: 12px; stroke: #9aa0a6; fill: none; stroke-width: 2; stroke-linecap: round; }
     .fr-dd-search input { border: none; outline: none; font-family: 'Roboto', sans-serif; font-size: 12px; color: #1a1a1a; background: transparent; width: 100%; }
@@ -294,32 +294,32 @@
 
     .cb-list { display: flex; flex-direction: column; }
     .cb-row { display: flex; align-items: center; gap: 9px; padding: 6px 13px; cursor: pointer; }
-    .cb-row:hover { background: #f1f3f4; }
+    .cb-row:hover { background: #fafbfc; }
     .cb {
-      width: 15px; height: 15px; border-radius: 3px; border: 2px solid #dadce0;
+      width: 15px; height: 15px; border-radius: 3px; border: 2px solid #e5e9f0;
       display: flex; align-items: center; justify-content: center;
       flex-shrink: 0; background: #fff; transition: all 0.1s;
     }
-    .cb.on { background: #1a73e8; border-color: #1a73e8; }
+    .cb.on { background: #1976d2; border-color: #1976d2; }
     .cb svg { display: none; width: 9px; height: 9px; stroke: #fff; fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
     .cb.on svg { display: block; }
     .cb-lbl { font-size: 13px; color: #3c4043; }
 
     .fr-foot {
       display: flex; justify-content: flex-end;
-      padding: 7px 11px 9px; border-top: 1px solid #f1f3f4;
-      margin-top: 2px;
+      padding: 8px 12px; border-top: 1px solid #eaeaea;
     }
     .apply-btn {
       background: #1a73e8; color: #fff; font-family: 'Roboto', sans-serif;
-      font-size: 12px; font-weight: 500; padding: 6px 18px;
+      font-size: 14px; font-weight: 500; padding: 7px 20px;
       border: none; border-radius: 6px; cursor: pointer;
     }
-    .apply-btn:hover { background: #1558b0; }
+    .apply-btn:hover { background: #1765cc; }
 
     .fp-see-all {
-      font-size: 13px; color: #1a73e8; font-weight: 500;
-      cursor: pointer; padding: 4px 2px; margin: 2px 10px 4px; display: inline-block;
+      font-size: 14px; color: #1976d2; font-weight: 400;
+      cursor: pointer; padding: 8px 0; margin: 0 20px 8px; display: inline-block;
+      letter-spacing: -0.28px;
     }
     .fp-see-all:hover { text-decoration: underline; }
 
@@ -535,6 +535,11 @@
       document.getElementById('filter-badge').textContent = activeCount;
       document.getElementById('filter-badge').classList.toggle('show', activeCount > 0);
       document.getElementById('fp-clear').classList.toggle('show', activeCount > 0);
+      const badge = document.getElementById('fp-badge');
+      if (badge) {
+        badge.textContent = activeCount;
+        badge.style.display = activeCount > 0 ? 'inline-flex' : 'none';
+      }
 
       const q = searchQuery.toLowerCase();
       const container = document.getElementById('fp-list');
