@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Aero Design System — Input Components</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Roboto:wght@300;400;500&family=DM+Mono:wght@400&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+
+/* ── TOKENS ── */
+:root{
+  --font-ui:'DM Sans',sans-serif;
+  --font-field:'Roboto',sans-serif;
+  --font-mono:'DM Mono',monospace;
+
+  /* Field geometry */
+  --f-radius:8px;
+  --f-height:56px;
+  --f-pad:8px 12px;
+  --f-pad-2:7px 11px;
+
+  /* Field colours */
+  --f-border:#dadce0;
+  --f-border-hover:#9aa0a6;
+  --f-blue:#1957d2;
+  --f-blue-bg:transparent;
+  --f-red:#d93025;
+  --f-red-bg:#fff8f7;
+  --f-green:#34a853;
+  --f-green-bg:#f4fbf6;
+  --f-disabled-bg:#f8f9fa;
+  --f-disabled-border:#e8eaed;
+  --f-readonly-bg:#f8f9fa;
+
+  /* Text */
+  --t-label:#5f6368;
+  --t-value:#212121;
+  --t-placeholder:#80868b;
+  --t-disabled:#b0b8c1;
+  --t-helper-err:#d93025;
+  --t-helper-ok:#34a853;
+
+  /* Label */
+  --lbl-size:11px;
+  --val-size:14px;
+  --helper-size:12px;
+
+  /* Page */
+  --page-bg:#f0f2f5;
+  --card-bg:#ffffff;
+  --section-gap:72px;
+}
+
+/* ── PAGE ── */
+body{font-family:var(--font-ui);background:var(--page-bg);color:var(--t-value);min-height:100vh;}
+
+/* ── HEADER ── */
+.hdr{
+  height:60px;background:#fff;
+  border-bottom:1px solid #e8eaed;
+  position:sticky;top:0;z-index:200;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 40px;
+}
+.hdr-left{display:flex;align-items:center;gap:12px;}
+.logo-mark{
+  width:30px;height:30px;background:#1976d2;
+  border-radius:8px;display:flex;align-items:center;justify-content:center;
+}
+.logo-mark svg{width:19px;height:19px;}
+.hdr-brand{font-size:14px;font-weight:600;color:#212121;letter-spacing:-0.2px;}
+.hdr-divider{width:1px;height:18px;background:#e8eaed;}
+.hdr-page{font-size:13px;color:#5f6368;font-weight:400;}
+.hdr-right{display:flex;align-items:center;gap:16px;}
+.hdr-tag{
+  font-size:11px;font-weight:500;
+  padding:3px 9px;border-radius:20px;
+  background:#e8f0fe;color:#1957d2;
+  letter-spacing:0.02em;
+}
+.hdr-date{font-size:12px;color:#9aa0a6;}
+
+/* ── TABS ── */
+.tabs{
+  background:#fff;border-bottom:1px solid #e8eaed;
+  padding:0 40px;display:flex;gap:2px;
+  position:sticky;top:60px;z-index:199;
+  overflow-x:auto;
+}
+.tab{
+  padding:13px 14px;font-size:13px;color:#5f6368;
+  cursor:pointer;border-bottom:2px solid transparent;
+  white-space:nowrap;transition:all .15s;font-weight:400;
+  font-family:var(--font-ui);
+}
+.tab:hover{color:#1957d2;}
+.tab.active{color:#1957d2;border-bottom-color:#1957d2;font-weight:500;}
+
+/* ── BODY ── */
+.body{padding:48px 40px;max-width:1360px;margin:0 auto;}
+
+/* ── SECTION ── */
+.sec{margin-bottom:var(--section-gap);scroll-margin-top:130px;}
+
+/* Multi-select checkbox */
+.ms-cb{
+  width:15px;height:15px;border-radius:3px;border:2px solid #dadce0;
+  display:inline-flex;align-items:center;justify-content:center;
+  flex-shrink:0;background:#fff;margin-right:8px;vertical-align:middle;
+}
+.ms-cb.ms-on{background:#1957d2;border-color:#1957d2;}
+.ms-cb.ms-on::after{content:'';width:8px;height:8px;background:url("data:image/svg+xml,%3Csvg viewBox='0 0 9 9' xmlns='http://www.w3.org/2000/svg'%3E%3Cpolyline points='1 4.5 3.5 7 8 2' fill='none' stroke='white' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat;}
+
+/* Multi-select chip */
+.ms-chip{
+  display:inline-flex;align-items:center;gap:4px;
+  background:#e8f0fe;color:#1957d2;
+  font-size:12px;font-weight:400;
+  padding:3px 8px 3px 10px;border-radius:20px;
+  font-family:var(--font-field);white-space:nowrap;
+}
+.ms-chip-x{font-size:14px;line-height:1;cursor:pointer;opacity:.7;margin-left:2px;}
+.ms-chip-x:hover{opacity:1;}
+.ms-chip.ms-chip-dis{background:#f1f3f4;color:#b0b8c1;cursor:not-allowed;}
+.sec-hd{margin-bottom:20px;}
+.sec-title{
+  font-size:19px;font-weight:600;color:#1a1a1a;
+  letter-spacing:-0.4px;margin-bottom:6px;
+  display:flex;align-items:center;gap:10px;
+}
+.sec-badge{
+  font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;
+  padding:3px 8px;border-radius:20px;
+  background:#f0f2f5;color:#5f6368;
+}
+.sec-desc{font-size:13px;color:#6b7280;line-height:1.6;}
+
+/* ── TOKENS ── */
+.tokens{display:flex;flex-wrap:wrap;gap:6px;margin:14px 0 24px;}
+.tok{
+  display:flex;align-items:center;gap:6px;
+  background:#fff;border:1px solid #e8eaed;border-radius:5px;
+  padding:4px 10px;
+  font-size:11px;color:#3c4043;font-family:var(--font-mono);
+  letter-spacing:-.01em;
+}
+.tok-dot{width:10px;height:10px;border-radius:3px;flex-shrink:0;}
+
+/* ── STATES GRID ── */
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
+@media(max-width:1100px){.grid{grid-template-columns:repeat(2,1fr);}}
+
+/* ── STATE CARD ── */
+.card{
+  background:#fff;border:1px solid #e8eaed;border-radius:10px;
+  padding:20px 20px 18px;display:flex;flex-direction:column;gap:16px;
+}
+.card-lbl{
+  font-size:10px;font-weight:600;letter-spacing:.08em;
+  text-transform:uppercase;color:#9aa0a6;
+}
+.card-lbl.c-blue{color:#1957d2;}
+.card-lbl.c-red{color:#d93025;}
+.card-lbl.c-green{color:#34a853;}
+.card-lbl.c-muted{color:#b0b8c1;}
+.card-note{font-size:11px;color:#b0b8c1;margin-top:2px;font-family:var(--font-mono);}
+
+/* ── THE FIELD ITSELF ── */
+.fw{display:flex;flex-direction:column;gap:0;font-family:var(--font-field);}
+
+.fi{
+  display:flex;align-items:center;gap:8px;
+  border:1px solid var(--f-border);border-radius:var(--f-radius);
+  background:#fff;padding:var(--f-pad);min-height:var(--f-height);
+  position:relative;
+}
+/* State modifiers */
+.fi.s-hover{border-color:var(--f-border-hover);}
+.fi.s-focus{border:2px solid var(--f-blue);padding:var(--f-pad-2);background:#fff;}
+.fi.s-focus .flab{color:var(--f-blue);}
+.fi.s-err{border:2px solid var(--f-red);padding:var(--f-pad-2);}
+.fi.s-err .flab{color:var(--f-red);}
+.fi.s-ok{border:2px solid var(--f-green);padding:var(--f-pad-2);}
+.fi.s-disabled{background:var(--f-disabled-bg);border-color:var(--f-disabled-border);cursor:not-allowed;}
+.fi.s-readonly{background:var(--f-readonly-bg);border-color:var(--f-border);cursor:default;}
+
+/* Inner label+value col */
+.fcol{display:flex;flex-direction:column;flex:1;min-width:0;justify-content:center;}
+.flab{font-size:var(--lbl-size);color:var(--t-label);line-height:1.3;margin-bottom:4px;transition:color .15s;white-space:nowrap;}
+.fval{font-size:var(--val-size);color:var(--t-value);line-height:1.4;}
+.fval.ph{color:var(--t-placeholder);}
+.fval.dis{color:var(--t-disabled);}
+
+/* Cursor */
+.cur{
+  display:inline-block;width:1.5px;height:13px;
+  background:var(--f-blue);animation:blink 1s infinite;
+  vertical-align:middle;margin-left:1px;
+}
+@keyframes blink{0%,49%{opacity:1;}50%,100%{opacity:0;}}
+
+/* Icon */
+.fic{width:16px;height:16px;flex-shrink:0;display:flex;align-items:center;justify-content:center;}
+.fic svg{width:16px;height:16px;fill:none;stroke:#9aa0a6;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+.fi.s-focus .fic svg{stroke:var(--f-blue);}
+.fi.s-err .fic svg{stroke:var(--f-red);}
+.fi.s-disabled .fic svg{stroke:#c8cdd2;}
+
+/* Suffix (chevron/clear) */
+.fsuf{flex-shrink:0;display:flex;align-items:center;}
+.fsuf svg{width:16px;height:16px;fill:none;stroke:#9aa0a6;stroke-width:2;stroke-linecap:round;}
+.fi.s-disabled .fsuf svg{stroke:#c8cdd2;}
+
+/* Prefix (phone) */
+.fpre{
+  
+  padding-right:10px;margin-right:2px;
+  border-right:1px solid #e0e0e0;flex-shrink:0;
+  font-size:13px;color:#3c4043;font-family:var(--font-field);
+}
+.fpre svg{width:13px;height:13px;fill:none;stroke:#5f6368;stroke-width:1.8;stroke-linecap:round;}
+.fi.s-disabled .fpre{opacity:.4;}
+
+/* Helper */
+.fhelp{
+  font-size:var(--helper-size);margin-top:5px;
+  
+  font-family:var(--font-field);
+}
+.fhelp.he{color:var(--t-helper-err);}
+.fhelp.ho{color:var(--t-helper-ok);}
+
+
+/* Textarea */
+.fi.ta{min-height:96px;align-items:flex-start;}
+.fi.ta .fcol{justify-content:flex-start;}
+.taval{font-size:var(--val-size);color:var(--t-value);line-height:1.6;word-break:break-word;}
+.taval.ph{color:var(--t-placeholder);}
+.taval.dis{color:var(--t-disabled);}
+
+/* Dropdown open panel */
+.dd-panel{
+  border:1px solid #dadce0;border-top:none;
+  border-radius:0 0 8px 8px;background:#fff;
+  box-shadow:0 4px 12px rgba(0,0,0,.08);
+  overflow:hidden;margin-top:-2px;
+}
+.ddo{
+  padding:9px 14px;font-size:13px;color:#212121;
+  cursor:pointer;display:flex;align-items:center;justify-content:space-between;
+  font-family:var(--font-field);
+}
+.ddo:hover{background:#f0f6ff;}
+.ddo.sel{background:#e8f0fe;color:#1957d2;}
+.ddo.sel svg{display:block;}
+.ddo svg{width:13px;height:13px;fill:none;stroke:#1957d2;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;display:none;}
+
+/* Search clear btn */
+.fclear{
+  width:18px;height:18px;border-radius:50%;background:#9aa0a6;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;cursor:pointer;
+}
+.fclear svg{width:10px;height:10px;fill:none;stroke:#fff;stroke-width:2.5;stroke-linecap:round;}
+
+/* Char count */
+.fcount{font-size:11px;color:#9aa0a6;text-align:right;margin-top:4px;font-family:var(--font-field);}
+
+/* Section divider */
+.sdiv{height:1px;background:#e4e7eb;margin-bottom:var(--section-gap);}
+</style>
+</head>
+<body>
+
+<!-- ── HEADER ── -->
+<header class="hdr">
+  <div class="hdr-left">
+    <div class="logo-mark">
+      <svg viewBox="0 0 36 36" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M25 11.5C25 9 23 7 20.5 7 19.2 7 18.1 7.5 17.3 8.3L11.5 13.5C10.6 14.3 10 15.4 10 16.7 10 19.1 12 21 14.5 21H16.5S14 22.2 13.5 24.5C13 26.8 14.5 29 16.8 29.3 19.5 29.7 22 27.8 22.5 25 22.8 23.4 22.2 21.9 21.1 20.8 23.4 20.1 25 18 25 15.5 25 14.3 24.6 13.2 23.9 12.3 24.6 12.1 25 11.8 25 11.5Z" fill="white"/></svg>
+    </div>
+    <div class="hdr-brand">Aero Design System</div>
+    <div class="hdr-divider"></div>
+    <div class="hdr-page">Input Components</div>
+  </div>
+  <div class="hdr-right">
+    <div class="hdr-tag">New DS Style</div>
+    <div class="hdr-date">Q2 2025</div>
+  </div>
+</header>
+
+<!-- ── TABS ── -->
+<nav class="tabs" id="tabs">
+  <div class="tab active" onclick="goTo('tf',this)">Text Field</div>
+  <div class="tab" onclick="goTo('pfx',this)">With Prefix</div>
+  <div class="tab" onclick="goTo('srch',this)">Search</div>
+  <div class="tab" onclick="goTo('ta',this)">Textarea</div>
+  <div class="tab" onclick="goTo('dd',this)">Dropdown</div>
+  <div class="tab" onclick="goTo('mdd',this)">Multi-select</div>
+</nav>
+
+<div class="body">
+
+<!-- ══════════════════════════════════════════ -->
+<!--  1 · TEXT FIELD — STANDARD               -->
+<!-- ══════════════════════════════════════════ -->
+<section class="sec" id="tf">
+  <div class="sec-hd">
+    <div class="sec-title">Text Field — Standard <span class="sec-badge">9 states</span></div>
+    <div class="sec-desc">Base single-line input. Floating label always visible. Used for names, email, generic text.</div>
+  </div>
+  <div class="tokens">
+    <div class="tok"><div class="tok-dot" style="background:#dadce0;border:1px solid #c8cdd2"></div>border #dadce0</div>
+    <div class="tok"><div class="tok-dot" style="background:#1957d2"></div>focus #1957d2</div>
+    <div class="tok"><div class="tok-dot" style="background:#d93025"></div>error #d93025</div>
+    <div class="tok"><div class="tok-dot" style="background:#34a853"></div>success #34a853</div>
+    <div class="tok"><div class="tok-dot" style="background:#f8f9fa;border:1px solid #e0e0e0"></div>disabled bg #f8f9fa</div>
+    <div class="tok">radius 8px</div>
+    <div class="tok">height 56px</div>
+    <div class="tok">label 11px · #5f6368</div>
+    <div class="tok">value 14px · #212121</div>
+    <div class="tok">helper 12px</div>
+  </div>
+  <div class="grid">
+
+    <!-- Empty -->
+    <div class="card">
+      <div><div class="card-lbl">Empty</div><div class="card-note">border: 1px #dadce0</div></div>
+      <div class="fw"><div class="fi"><div class="fcol"><span class="flab">Label</span><span class="fval ph">Enter input</span></div></div></div>
+    </div>
+
+    <!-- Hover -->
+    <div class="card">
+      <div><div class="card-lbl">Hover</div><div class="card-note">border: 1px #9aa0a6</div></div>
+      <div class="fw"><div class="fi s-hover"><div class="fcol"><span class="flab">Label</span><span class="fval ph">Enter input</span></div></div></div>
+    </div>
+
+    <!-- Focused empty -->
+    <div class="card">
+      <div><div class="card-lbl c-blue">Focused — Empty</div><div class="card-note">border: 2px #1957d2</div></div>
+      <div class="fw"><div class="fi s-focus"><div class="fcol"><span class="flab">Label</span><span class="fval ph">Enter input<span class="cur"></span></span></div></div></div>
+    </div>
+
+    <!-- Focused filled -->
+    <div class="card">
+      <div><div class="card-lbl c-blue">Focused — Filled</div><div class="card-note">border: 2px #1957d2</div></div>
+      <div class="fw"><div class="fi s-focus"><div class="fcol"><span class="flab">Label</span><span class="fval">Rishi Sharma<span class="cur"></span></span></div></div></div>
+    </div>
+
+    <!-- Filled -->
+    <div class="card">
+      <div><div class="card-lbl">Filled</div><div class="card-note">border: 1px #dadce0</div></div>
+      <div class="fw"><div class="fi"><div class="fcol"><span class="flab">Label</span><span class="fval">Rishi Sharma</span></div></div></div>
+    </div>
+
+    <!-- Error empty -->
+    <div class="card">
+      <div><div class="card-lbl c-red">Error — Empty</div><div class="card-note">border: 2px #d93025</div></div>
+      <div class="fw">
+        <div class="fi s-err"><div class="fcol"><span class="flab">Label</span><span class="fval ph">Enter input</span></div></div>
+        <div class="fhelp he">This is an error message</div>
+      </div>
+    </div>
+
+    <!-- Error filled -->
+    <div class="card">
+      <div><div class="card-lbl c-red">Error — Filled</div><div class="card-note">border: 2px #d93025 + helper</div></div>
+      <div class="fw">
+        <div class="fi s-err"><div class="fcol"><span class="flab">Label</span><span class="fval">invalid-input@</span></div></div>
+        <div class="fhelp he">This is an error message</div>
+      </div>
+    </div>
+
+    <!-- Success -->
+    <div class="card">
+      <div><div class="card-lbl c-green">Success / Validated</div><div class="card-note">border: 2px #34a853 + helper</div></div>
+      <div class="fw">
+        <div class="fi s-ok"><div class="fcol"><span class="flab">Label</span><span class="fval">rishi@birdeye.com</span></div></div>
+        <div class="fhelp ho">Validation successful</div>
+      </div>
+    </div>
+
+    <!-- Disabled -->
+    <div class="card">
+      <div><div class="card-lbl c-muted">Disabled</div><div class="card-note">bg #f8f9fa · no interaction</div></div>
+      <div class="fw"><div class="fi s-disabled"><div class="fcol"><span class="flab">Label</span><span class="fval dis">Enter input</span></div></div></div>
+    </div>
+
+    <!-- Read-only -->
+    <div class="card">
+      <div><div class="card-lbl c-muted">Read-only</div><div class="card-note">bg #f8f9fa · readable only</div></div>
+      <div class="fw"><div class="fi s-readonly"><div class="fcol"><span class="flab">Label</span><span class="fval">Rishi Sharma</span></div></div></div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════ -->
+<!--  2 · TEXT FIELD WITH PREFIX              -->
+<!-- ══════════════════════════════════════════ -->
+<section class="sec" id="pfx">
+  <div class="sec-hd">
+    <div class="sec-title">Text Field — With Prefix <span class="sec-badge">9 states</span></div>
+    <div class="sec-desc">Text input with a preset left prefix. Used for phone numbers, country codes, and unit labels. Prefix stays visible in all states.</div>
+  </div>
+  <div class="tokens">
+    <div class="tok">prefix: icon + code + chevron</div>
+    <div class="tok">prefix color: #3c4043</div>
+    <div class="tok">prefix divider: 1px #e0e0e0</div>
+    <div class="tok">disabled prefix: opacity 0.4</div>
+    <div class="tok">all other tokens → same as Standard</div>
+  </div>
+  <div class="grid">
+
+    <!-- Empty -->
+    <div class="card">
+      <div><div class="card-lbl">Empty</div><div class="card-note">border: 1px #dadce0</div></div>
+      <div class="fw"><div class="fi">
+        <div class="fpre"><svg viewBox="0 0 16 16"><path d="M14 11.5a.9.9 0 01-.27.63l-1.78 1.8a1.4 1.4 0 01-1 .42c-.07 0-.16 0-.25-.02A13.6 13.6 0 013.6 12.4 12.6 12.6 0 011.67 9.3a13.7 13.7 0 01-.37-3.83 1.39 1.39 0 01.4-.98L3.5 2.7a.9.9 0 01.63-.27c.23 0 .44.08.63.23L6.54 4.4c.2.15.3.34.3.57a.9.9 0 01-.28.6l-.73.74-.05.14a.6.6 0 00.08.28 7.8 7.8 0 001.44 1.84 7.6 7.6 0 001.84 1.43.63.63 0 00.3.08.2.2 0 00.15-.06l.73-.74a.88.88 0 01.62-.27c.23 0 .42.07.57.2l1.76 1.4c.2.17.3.37.3.6z"/></svg>+1<svg viewBox="0 0 8 8" style="width:10px;height:10px;stroke:#9aa0a6;fill:none;stroke-width:2;stroke-linecap:round"><polyline points="1 3 4 6 7 3"/></svg></div>
+        <div class="fcol"><span class="flab">Phone</span><span class="fval ph">Enter number</span></div>
+      </div></div>
+    </div>
+
+    <!-- Hover -->
+    <div class="card">
+      <div><div class="card-lbl">Hover</div><div class="card-note">border: 1px #9aa0a6</div></div>
+      <div class="fw"><div class="fi s-hover">
+        <div class="fpre"><svg viewBox="0 0 16 16"><path d="M14 11.5a.9.9 0 01-.27.63l-1.78 1.8a1.4 1.4 0 01-1 .42c-.07 0-.16 0-.25-.02A13.6 13.6 0 013.6 12.4 12.6 12.6 0 011.67 9.3a13.7 13.7 0 01-.37-3.83 1.39 1.39 0 01.4-.98L3.5 2.7a.9.9 0 01.63-.27c.23 0 .44.08.63.23L6.54 4.4c.2.15.3.34.3.57a.9.9 0 01-.28.6l-.73.74-.05.14a.6.6 0 00.08.28 7.8 7.8 0 001.44 1.84 7.6 7.6 0 001.84 1.43.63.63 0 00.3.08.2.2 0 00.15-.06l.73-.74a.88.88 0 01.62-.27c.23 0 .42.07.57.2l1.76 1.4c.2.17.3.37.3.6z"/></svg>+1<svg viewBox="0 0 8 8" style="width:10px;height:10px;stroke:#9aa0a6;fill:none;stroke-width:2;stroke-linecap:round"><polyline points="1 3 4 6 7 3"/></svg></div>
+        <div class="fcol"><span class="flab">Phone</span><span class="fval ph">Enter number</span></div>
+      </div></div>
+    </div>
+
+    <!-- Focused empty -->
+    <div class="card">
+      <div><div class="card-lbl c-blue">Focused — Empty</div><div class="card-note">border: 2px #1957d2</div></div>
+      <div class="fw"><div class="fi s-focus">
+        <div class="fpre"><svg viewBox="0 0 16 16"><path d="M14 11.5a.9.9 0 01-.27.63l-1.78 1.8a1.4 1.4 0 01-1 .42c-.07 0-.16 0-.25-.02A13.6 13.6 0 013.6 12.4 12.6 12.6 0 011.67 9.3a13.7 13.7 0 01-.37-3.83 1.39 1.39 0 01.4-.98L3.5 2.7a.9.9 0 01.63-.27c.23 0 .44.08.63.23L6.54 4.4c.2.15.3.34.3.57a.9.9 0 01-.28.6l-.73.74-.05.14a.6.6 0 00.08.28 7.8 7.8 0 001.44 1.84 7.6 7.6 0 001.84 1.43.63.63 0 00.3.08.2.2 0 00.15-.06l.73-.74a.88.88 0 01.62-.27c.23 0 .42.07.57.2l1.76 1.4c.2.17.3.37.3.6z"/></svg>+1<svg viewBox="0 0 8 8" style="width:10px;height:10px;stroke:#1957d2;fill:none;stroke-width:2;stroke-linecap:round"><polyline points="1 3 4 6 7 3"/></svg></div>
+        <div class="fcol"><span class="flab">Phone</span><span class="fval ph">Enter number<span class="cur"></span></span></div>
+      </div></div>
+    </div>
+
+    <!-- Focused filled -->
+    <div class="card">
+      <div><div class="card-lbl c-blue">Focused — Filled</div><div class="card-note">border: 2px #1957d2</div></div>
+      <div class="fw"><div class="fi s-focus">
+        <div class="fpre"><svg viewBox="0 0 16 16"><path d="M14 11.5a.9.9 0 01-.27.63l-1.78 1.8a1.4 1.4 0 01-1 .42c-.07 0-.16 0-.25-.02A13.6 13.6 0 013.6 12.4 12.6 12.6 0 011.67 9.3a13.7 13.7 0 01-.37-3.83 1.39 1.39 0 01.4-.98L3.5 2.7a.9.9 0 01.63-.27c.23 0 .44.08.63.23L6.54 4.4c.2.15.3.34.3.57a.9.9 0 01-.28.6l-.73.74-.05.14a.6.6 0 00.08.28 7.8 7.8 0 001.44 1.84 7.6 7.6 0 001.84 1.43.63.63 0 00.3.08.2.2 0 00.15-.06l.73-.74a.88.88 0 01.62-.27c.23 0 .42.07.57.2l1.76 1.4c.2.17.3.37.3.6z"/></svg>+1<svg viewBox="0 0 8 8" style="width:10px;height:10px;stroke:#1957d2;fill:none;stroke-width:2;stroke-linecap:round"><polyline points="1 3 4 6 7 3"/></svg></div>
+        <div class="fcol"><span class="flab">Phone</span><span class="fval">(800) 700-6503<span class="cur"></span></span></div>
+      </div></div>
+    </div>
+
+    <!-- Filled -->
+    <div class="card">
+      <div><div class="card-lbl">Filled</div><div class="card-note">border: 1px #dadce0</div></div>
+      <div class="fw"><div class="fi">
+        <div class="fpre"><svg viewBox="0 0 16 16"><path d="M14 11.5a.9.9 0 01-.27.63l-1.78 1.8a1.4 1.4 0 01-1 .42c-.07 0-.16 0-.25-.02A13.6 13.6 0 013.6 12.4 12.6 12.6 0 011.67 9.3a13.7 13.7 0 01-.37-3.83 1.39 1.39 0 01.4-.98L3.5 2.7a.9.9 0 01.63-.27c.23 0 .44.08.63.23L6.54 4.4c.2.15.3.34.3.57a.9.9 0 01-.28.6l-.73.74-.05.14a.6.6 0 00.08.28 7.8 7.8 0 001.44 1.84 7.6 7.6 0 001.84 1.43.63.63 0 00.3.08.2.2 0 00.15-.06l.73-.74a.88.88 0 01.62-.27c.23 0 .42.07.57.2l1.76 1.4c.2.17.3.37.3.6z"/></svg>+1<svg viewBox="0 0 8 8" style="width:10px;height:10px;stroke:#9aa0a6;fill:none;stroke-width:2;stroke-linecap:round"><polyline points="1 3 4 6 7 3"/></svg></div>
+        <div class="fcol"><span class="flab">Phone</span><span class="fval">(800) 700-6503</span></div>
+      </div></div>
+    </div>
+
+    <!-- Error empty -->
+    <div class="card">
+      <div><div class="card-lbl c-red">Error — Empty</div><div class="card-note">border: 2px #d93025</div></div>
+      <div class="fw">
+        <div class="fi s-err">
+          <div class="fpre" style="opacity:.6"><svg viewBox="0 0 16 16"><path d="M14 11.5a.9.9 0 01-.27.63l-1.78 1.8a1.4 1.4 0 01-1 .42c-.07 0-.16 0-.25-.02A13.6 13.6 0 013.6 12.4 12.6 12.6 0 011.67 9.3a13.7 13.7 0 01-.37-3.83 1.39 1.39 0 01.4-.98L3.5 2.7a.9.9 0 01.63-.27c.23 0 .44.08.63.23L6.54 4.4c.2.15.3.34.3.57a.9.9 0 01-.28.6l-.73.74-.05.14a.6.6 0 00.08.28 7.8 7.8 0 001.44 1.84 7.6 7.6 0 001.84 1.43.63.63 0 00.3.08.2.2 0 00.15-.06l.73-.74a.88.88 0 01.62-.27c.23 0 .42.07.57.2l1.76 1.4c.2.17.3.37.3.6z"/></svg>+1<svg viewBox="0 0 8 8" style="width:10px;height:10px;stroke:#9aa0a6;fill:none;stroke-width:2;stroke-linecap:round"><polyline points="1 3 4 6 7 3"/></svg></div>
+          <div class="fcol"><span class="flab">Phone</span><span class="fval ph">Enter number</span></div>
+        </div>
+        <div class="fhelp he">This is an error</div>
+      </div>
+    </div>
+
+    <!-- Error filled -->
+    <div class="card">
+      <div><div class="card-lbl c-red">Error — Filled</div><div class="card-note">border: 2px #d93025 + helper</div></div>
+      <div class="fw">
+        <div class="fi s-err">
+          <div class="fpre"><svg viewBox="0 0 16 16"><path d="M14 11.5a.9.9 0 01-.27.63l-1.78 1.8a1.4 1.4 0 01-1 .42c-.07 0-.16 0-.25-.02A13.6 13.6 0 013.6 12.4 12.6 12.6 0 011.67 9.3a13.7 13.7 0 01-.37-3.83 1.39 1.39 0 01.4-.98L3.5 2.7a.9.9 0 01.63-.27c.23 0 .44.08.63.23L6.54 4.4c.2.15.3.34.3.57a.9.9 0 01-.28.6l-.73.74-.05.14a.6.6 0 00.08.28 7.8 7.8 0 001.44 1.84 7.6 7.6 0 001.84 1.43.63.63 0 00.3.08.2.2 0 00.15-.06l.73-.74a.88.88 0 01.62-.27c.23 0 .42.07.57.2l1.76 1.4c.2.17.3.37.3.6z"/></svg>+1<svg viewBox="0 0 8 8" style="width:10px;height:10px;stroke:#9aa0a6;fill:none;stroke-width:2;stroke-linecap:round"><polyline points="1 3 4 6 7 3"/></svg></div>
+          <div class="fcol"><span class="flab">Phone</span><span class="fval">800-abc-invalid</span></div>
+        </div>
+        <div class="fhelp he">This is an error</div>
+      </div>
+    </div>
+
+    <!-- Success -->
+    <div class="card">
+      <div><div class="card-lbl c-green">Success / Validated</div><div class="card-note">border: 2px #34a853 + helper</div></div>
+      <div class="fw">
+        <div class="fi s-ok">
+          <div class="fpre"><svg viewBox="0 0 16 16"><path d="M14 11.5a.9.9 0 01-.27.63l-1.78 1.8a1.4 1.4 0 01-1 .42c-.07 0-.16 0-.25-.02A13.6 13.6 0 013.6 12.4 12.6 12.6 0 011.67 9.3a13.7 13.7 0 01-.37-3.83 1.39 1.39 0 01.4-.98L3.5 2.7a.9.9 0 01.63-.27c.23 0 .44.08.63.23L6.54 4.4c.2.15.3.34.3.57a.9.9 0 01-.28.6l-.73.74-.05.14a.6.6 0 00.08.28 7.8 7.8 0 001.44 1.84 7.6 7.6 0 001.84 1.43.63.63 0 00.3.08.2.2 0 00.15-.06l.73-.74a.88.88 0 01.62-.27c.23 0 .42.07.57.2l1.76 1.4c.2.17.3.37.3.6z"/></svg>+1<svg viewBox="0 0 8 8" style="width:10px;height:10px;stroke:#9aa0a6;fill:none;stroke-width:2;stroke-linecap:round"><polyline points="1 3 4 6 7 3"/></svg></div>
+          <div class="fcol"><span class="flab">Phone</span><span class="fval">(800) 700-6503</span></div>
+        </div>
+        <div class="fhelp ho">Validation successful</div>
+      </div>
+    </div>
+
+    <!-- Disabled -->
+    <div class="card">
+      <div><div class="card-lbl c-muted">Disabled</div><div class="card-note">bg #f8f9fa · prefix opacity 0.4</div></div>
+      <div class="fw"><div class="fi s-disabled">
+        <div class="fpre" style="opacity:.4"><svg viewBox="0 0 16 16"><path d="M14 11.5a.9.9 0 01-.27.63l-1.78 1.8a1.4 1.4 0 01-1 .42c-.07 0-.16 0-.25-.02A13.6 13.6 0 013.6 12.4 12.6 12.6 0 011.67 9.3a13.7 13.7 0 01-.37-3.83 1.39 1.39 0 01.4-.98L3.5 2.7a.9.9 0 01.63-.27c.23 0 .44.08.63.23L6.54 4.4c.2.15.3.34.3.57a.9.9 0 01-.28.6l-.73.74-.05.14a.6.6 0 00.08.28 7.8 7.8 0 001.44 1.84 7.6 7.6 0 001.84 1.43.63.63 0 00.3.08.2.2 0 00.15-.06l.73-.74a.88.88 0 01.62-.27c.23 0 .42.07.57.2l1.76 1.4c.2.17.3.37.3.6z"/></svg>+1<svg viewBox="0 0 8 8" style="width:10px;height:10px;stroke:#9aa0a6;fill:none;stroke-width:2;stroke-linecap:round"><polyline points="1 3 4 6 7 3"/></svg></div>
+        <div class="fcol"><span class="flab">Phone</span><span class="fval dis">Enter number</span></div>
+      </div></div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════ -->
+<!--  3 · SEARCH FIELD                        -->
+<!-- ══════════════════════════════════════════ -->
+<section class="sec" id="srch">
+  <div class="sec-hd">
+    <div class="sec-title">Search Field <span class="sec-badge">7 states</span></div>
+    <div class="sec-desc">Single-line search input with leading icon. Includes a clear (×) action when filled. No error/success states — search fields don't validate.</div>
+  </div>
+  <div class="tokens">
+    <div class="tok">leading icon: search · 16px · #9aa0a6</div>
+    <div class="tok">clear btn: × icon · appears on fill</div>
+    <div class="tok">no error/success state</div>
+    <div class="tok">all other tokens → same as Standard</div>
+  </div>
+  <div class="grid">
+
+    <!-- Empty -->
+    <div class="card">
+      <div><div class="card-lbl">Empty</div><div class="card-note">icon: #9aa0a6</div></div>
+      <div class="fw"><div class="fi">
+        <div class="fic"><svg viewBox="0 0 18 18"><circle cx="8" cy="8" r="5.5"/><line x1="12.5" y1="12.5" x2="16" y2="16"/></svg></div>
+        <div class="fcol"><span class="flab">Search</span><span class="fval ph">Search contacts, campaigns…</span></div>
+      </div></div>
+    </div>
+
+    <!-- Hover -->
+    <div class="card">
+      <div><div class="card-lbl">Hover</div><div class="card-note">border: 1px #9aa0a6</div></div>
+      <div class="fw"><div class="fi s-hover">
+        <div class="fic"><svg viewBox="0 0 18 18"><circle cx="8" cy="8" r="5.5"/><line x1="12.5" y1="12.5" x2="16" y2="16"/></svg></div>
+        <div class="fcol"><span class="flab">Search</span><span class="fval ph">Search contacts, campaigns…</span></div>
+      </div></div>
+    </div>
+
+    <!-- Focused -->
+    <div class="card">
+      <div><div class="card-lbl c-blue">Focused</div><div class="card-note">border: 2px #1957d2 · icon blue</div></div>
+      <div class="fw"><div class="fi s-focus">
+        <div class="fic"><svg viewBox="0 0 18 18" style="stroke:#1957d2"><circle cx="8" cy="8" r="5.5"/><line x1="12.5" y1="12.5" x2="16" y2="16"/></svg></div>
+        <div class="fcol"><span class="flab">Search</span><span class="fval ph">Search contacts, campaigns…<span class="cur"></span></span></div>
+      </div></div>
+    </div>
+
+    <!-- Filled -->
+    <div class="card">
+      <div><div class="card-lbl">Filled</div><div class="card-note">shows clear (×) button</div></div>
+      <div class="fw"><div class="fi">
+        <div class="fic"><svg viewBox="0 0 18 18"><circle cx="8" cy="8" r="5.5"/><line x1="12.5" y1="12.5" x2="16" y2="16"/></svg></div>
+        <div class="fcol"><span class="flab">Search</span><span class="fval">Rishi Sharma</span></div>
+        <div class="fclear"><svg viewBox="0 0 10 10"><line x1="1.5" y1="1.5" x2="8.5" y2="8.5"/><line x1="8.5" y1="1.5" x2="1.5" y2="8.5"/></svg></div>
+      </div></div>
+    </div>
+
+    <!-- Focused filled -->
+    <div class="card">
+      <div><div class="card-lbl c-blue">Focused — Filled</div><div class="card-note">blue border + clear visible</div></div>
+      <div class="fw"><div class="fi s-focus">
+        <div class="fic"><svg viewBox="0 0 18 18" style="stroke:#1957d2"><circle cx="8" cy="8" r="5.5"/><line x1="12.5" y1="12.5" x2="16" y2="16"/></svg></div>
+        <div class="fcol"><span class="flab">Search</span><span class="fval">Rishi Sharma<span class="cur"></span></span></div>
+        <div class="fclear"><svg viewBox="0 0 10 10"><line x1="1.5" y1="1.5" x2="8.5" y2="8.5"/><line x1="8.5" y1="1.5" x2="1.5" y2="8.5"/></svg></div>
+      </div></div>
+    </div>
+
+    <!-- Disabled -->
+    <div class="card">
+      <div><div class="card-lbl c-muted">Disabled</div><div class="card-note">bg #f8f9fa · no interaction</div></div>
+      <div class="fw"><div class="fi s-disabled">
+        <div class="fic"><svg viewBox="0 0 18 18" style="stroke:#c8cdd2"><circle cx="8" cy="8" r="5.5"/><line x1="12.5" y1="12.5" x2="16" y2="16"/></svg></div>
+        <div class="fcol"><span class="flab">Search</span><span class="fval dis">Search contacts, campaigns…</span></div>
+      </div></div>
+    </div>
+
+    <!-- Read-only -->
+    <div class="card">
+      <div><div class="card-lbl c-muted">Read-only</div><div class="card-note">bg #f8f9fa · value visible</div></div>
+      <div class="fw"><div class="fi s-readonly">
+        <div class="fic"><svg viewBox="0 0 18 18" style="stroke:#c8cdd2"><circle cx="8" cy="8" r="5.5"/><line x1="12.5" y1="12.5" x2="16" y2="16"/></svg></div>
+        <div class="fcol"><span class="flab">Search</span><span class="fval">Rishi Sharma</span></div>
+      </div></div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════ -->
+<!--  4 · TEXTAREA                            -->
+<!-- ══════════════════════════════════════════ -->
+<section class="sec" id="ta">
+  <div class="sec-hd">
+    <div class="sec-title">Textarea <span class="sec-badge">8 states</span></div>
+    <div class="sec-desc">Multi-line text input. Same token system as the standard field. Character count shown on focus. No resize handle in DS.</div>
+  </div>
+  <div class="tokens">
+    <div class="tok">min-height: 96px</div>
+    <div class="tok">char count: 12px · #9aa0a6 · right-aligned</div>
+    <div class="tok">label aligns to top-left</div>
+    <div class="tok">all other tokens → same as Standard</div>
+  </div>
+  <div class="grid">
+
+    <!-- Empty -->
+    <div class="card">
+      <div><div class="card-lbl">Empty</div><div class="card-note">border: 1px #dadce0</div></div>
+      <div class="fw"><div class="fi ta"><div class="fcol"><span class="flab">Label</span><span class="taval ph">Enter text…</span></div></div></div>
+    </div>
+
+    <!-- Hover -->
+    <div class="card">
+      <div><div class="card-lbl">Hover</div><div class="card-note">border: 1px #9aa0a6</div></div>
+      <div class="fw"><div class="fi ta s-hover"><div class="fcol"><span class="flab">Label</span><span class="taval ph">Enter text…</span></div></div></div>
+    </div>
+
+    <!-- Focused -->
+    <div class="card">
+      <div><div class="card-lbl c-blue">Focused</div><div class="card-note">border: 2px #1957d2 · char count</div></div>
+      <div class="fw">
+        <div class="fi ta s-focus"><div class="fcol"><span class="flab">Label</span><span class="taval ph">Enter text…<span class="cur"></span></span></div></div>
+        <div class="fcount">0 / 500</div>
+      </div>
+    </div>
+
+    <!-- Filled -->
+    <div class="card">
+      <div><div class="card-lbl">Filled</div><div class="card-note">border: 1px #dadce0 · char count</div></div>
+      <div class="fw">
+        <div class="fi ta"><div class="fcol"><span class="flab">Label</span><span class="taval">We had a great experience with the team. The response time was excellent and the issue was resolved same day.</span></div></div>
+        <div class="fcount">102 / 500</div>
+      </div>
+    </div>
+
+    <!-- Focused filled -->
+    <div class="card">
+      <div><div class="card-lbl c-blue">Focused — Filled</div><div class="card-note">blue border + char count</div></div>
+      <div class="fw">
+        <div class="fi ta s-focus"><div class="fcol"><span class="flab">Label</span><span class="taval">We had a great experience.<span class="cur"></span></span></div></div>
+        <div class="fcount">26 / 500</div>
+      </div>
+    </div>
+
+    <!-- Error empty -->
+    <div class="card">
+      <div><div class="card-lbl c-red">Error — Empty</div><div class="card-note">border: 2px #d93025</div></div>
+      <div class="fw">
+        <div class="fi ta s-err"><div class="fcol"><span class="flab">Label</span><span class="taval ph">Enter text…</span></div></div>
+        <div class="fhelp he">This field is required</div>
+      </div>
+    </div>
+
+    <!-- Error filled -->
+    <div class="card">
+      <div><div class="card-lbl c-red">Error — Filled</div><div class="card-note">border: 2px #d93025 + helper</div></div>
+      <div class="fw">
+        <div class="fi ta s-err"><div class="fcol"><span class="flab">Label</span><span class="taval">Too short.</span></div></div>
+        <div class="fhelp he">Minimum 20 characters required</div>
+      </div>
+    </div>
+
+    <!-- Disabled -->
+    <div class="card">
+      <div><div class="card-lbl c-muted">Disabled</div><div class="card-note">bg #f8f9fa · no interaction</div></div>
+      <div class="fw"><div class="fi ta s-disabled"><div class="fcol"><span class="flab">Label</span><span class="taval dis">Enter text…</span></div></div></div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════ -->
+<!--  5 · DROPDOWN / SELECT                   -->
+<!-- ══════════════════════════════════════════ -->
+<section class="sec" id="dd">
+  <div class="sec-hd">
+    <div class="sec-title">Dropdown / Select <span class="sec-badge">8 states</span></div>
+    <div class="sec-desc">Single-select dropdown. Chevron icon on right. Open state shows option panel below. Selected option replaces placeholder. Supports error and success.</div>
+  </div>
+  <div class="tokens">
+    <div class="tok">chevron: 16px · #9aa0a6</div>
+    <div class="tok">open panel: radius 0 0 8px 8px</div>
+    <div class="tok">option height: 38px</div>
+    <div class="tok">option hover: bg #f0f6ff</div>
+    <div class="tok">selected: bg #e8f0fe · color #1957d2</div>
+    <div class="tok">panel shadow: 0 4px 12px rgba(0,0,0,.08)</div>
+  </div>
+  <div class="grid">
+
+    <!-- Empty -->
+    <div class="card">
+      <div><div class="card-lbl">Empty</div><div class="card-note">chevron: #9aa0a6</div></div>
+      <div class="fw"><div class="fi">
+        <div class="fcol"><span class="flab">Label</span><span class="fval ph">Select option</span></div>
+        <div class="fsuf"><svg viewBox="0 0 16 16"><polyline points="3 6 8 11 13 6"/></svg></div>
+      </div></div>
+    </div>
+
+    <!-- Hover -->
+    <div class="card">
+      <div><div class="card-lbl">Hover</div><div class="card-note">border: 1px #9aa0a6</div></div>
+      <div class="fw"><div class="fi s-hover">
+        <div class="fcol"><span class="flab">Label</span><span class="fval ph">Select option</span></div>
+        <div class="fsuf"><svg viewBox="0 0 16 16"><polyline points="3 6 8 11 13 6"/></svg></div>
+      </div></div>
+    </div>
+
+    <!-- Open -->
+    <div class="card">
+      <div><div class="card-lbl c-blue">Open / Focused</div><div class="card-note">border: 2px #1957d2 · panel shows</div></div>
+      <div class="fw">
+        <div class="fi s-focus" style="border-radius:8px 8px 0 0;">
+          <div class="fcol"><span class="flab">Label</span><span class="fval ph">Select option</span></div>
+          <div class="fsuf"><svg viewBox="0 0 16 16" style="transform:rotate(180deg)"><polyline points="3 6 8 11 13 6"/></svg></div>
+        </div>
+        <div class="dd-panel">
+          <div class="ddo">Option 1</div>
+          <div class="ddo" style="background:#f0f7ff;">Option 2</div>
+          <div class="ddo">Option 3</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filled -->
+    <div class="card">
+      <div><div class="card-lbl">Filled / Selected</div><div class="card-note">border: 1px #dadce0 · value shown</div></div>
+      <div class="fw"><div class="fi">
+        <div class="fcol"><span class="flab">Label</span><span class="fval">Option 2</span></div>
+        <div class="fsuf"><svg viewBox="0 0 16 16"><polyline points="3 6 8 11 13 6"/></svg></div>
+      </div></div>
+    </div>
+
+    <!-- Open with selection -->
+    <div class="card">
+      <div><div class="card-lbl c-blue">Open — With Selection</div><div class="card-note">selected option highlighted</div></div>
+      <div class="fw">
+        <div class="fi s-focus" style="border-radius:8px 8px 0 0;">
+          <div class="fcol"><span class="flab">Label</span><span class="fval">Option 2</span></div>
+          <div class="fsuf"><svg viewBox="0 0 16 16" style="transform:rotate(180deg)"><polyline points="3 6 8 11 13 6"/></svg></div>
+        </div>
+        <div class="dd-panel">
+          <div class="ddo">Option 1</div>
+          <div class="ddo sel">Option 2<svg viewBox="0 0 13 13"><polyline points="1.5 6.5 5 10 11.5 3" class="dd-check"/></svg></div>
+          <div class="ddo">Option 3</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Error -->
+    <div class="card">
+      <div><div class="card-lbl c-red">Error</div><div class="card-note">border: 2px #d93025 + helper</div></div>
+      <div class="fw">
+        <div class="fi s-err">
+          <div class="fcol"><span class="flab">Label</span><span class="fval ph">Select option</span></div>
+          <div class="fsuf"><svg viewBox="0 0 16 16" style="stroke:#d93025"><polyline points="3 6 8 11 13 6"/></svg></div>
+        </div>
+        <div class="fhelp he">Please select an option</div>
+      </div>
+    </div>
+
+    <!-- Success -->
+    <div class="card">
+      <div><div class="card-lbl c-green">Success / Validated</div><div class="card-note">border: 2px #34a853 + helper</div></div>
+      <div class="fw">
+        <div class="fi s-ok">
+          <div class="fcol"><span class="flab">Label</span><span class="fval">Option 2</span></div>
+          <div class="fsuf"><svg viewBox="0 0 16 16" style="stroke:#34a853"><polyline points="3 6 8 11 13 6"/></svg></div>
+        </div>
+        <div class="fhelp ho">Validation successful</div>
+      </div>
+    </div>
+
+    <!-- Disabled Empty -->
+    <div class="card">
+      <div><div class="card-lbl c-muted">Disabled — Empty</div><div class="card-note">bg #f8f9fa · no value · no interaction</div></div>
+      <div class="fw"><div class="fi s-disabled">
+        <div class="fcol"><span class="flab">Label</span><span class="fval dis">Select option</span></div>
+        <div class="fsuf"><svg viewBox="0 0 16 16" style="stroke:#c8cdd2"><polyline points="3 6 8 11 13 6"/></svg></div>
+      </div></div>
+    </div>
+
+    <!-- Disabled Filled -->
+    <div class="card">
+      <div><div class="card-lbl c-muted">Disabled — Filled</div><div class="card-note">bg #f8f9fa · has value · not editable</div></div>
+      <div class="fw"><div class="fi s-disabled">
+        <div class="fcol"><span class="flab">Label</span><span class="fval dis">Option 2</span></div>
+        <div class="fsuf"><svg viewBox="0 0 16 16" style="stroke:#c8cdd2"><polyline points="3 6 8 11 13 6"/></svg></div>
+      </div></div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════ -->
+<!--  6 · MULTI-SELECT DROPDOWN               -->
+<!-- ══════════════════════════════════════════ -->
+<section class="sec" id="mdd">
+  <div class="sec-hd">
+    <div class="sec-title">Multi-select Dropdown <span class="sec-badge">9 states</span></div>
+    <div class="sec-desc">Select multiple options via checkboxes. Selected values appear as chips inside the field. Chips can be individually cleared. Apply / Done closes the panel.</div>
+  </div>
+  <div class="tokens">
+    <div class="tok">checkbox: 15px · checked bg #1957d2</div>
+    <div class="tok">chip bg: #e8f0fe · chip text: #1957d2</div>
+    <div class="tok">chip ×: 10px · #1957d2</div>
+    <div class="tok">option hover: bg #f5f7ff</div>
+    <div class="tok">all border/focus tokens → same as Dropdown</div>
+  </div>
+  <div class="grid">
+
+    <!-- Empty -->
+    <div class="card">
+      <div><div class="card-lbl">Empty</div><div class="card-note">border: 1px #dadce0</div></div>
+      <div class="fw"><div class="fi">
+        <div class="fcol"><span class="flab">Label</span><span class="fval ph">Select options</span></div>
+        <div class="fsuf"><svg viewBox="0 0 16 16"><polyline points="3 6 8 11 13 6"/></svg></div>
+      </div></div>
+    </div>
+
+    <!-- Hover -->
+    <div class="card">
+      <div><div class="card-lbl">Hover</div><div class="card-note">border: 1px #9aa0a6</div></div>
+      <div class="fw"><div class="fi s-hover">
+        <div class="fcol"><span class="flab">Label</span><span class="fval ph">Select options</span></div>
+        <div class="fsuf"><svg viewBox="0 0 16 16"><polyline points="3 6 8 11 13 6"/></svg></div>
+      </div></div>
+    </div>
+
+    <!-- Open none selected -->
+    <div class="card">
+      <div><div class="card-lbl c-blue">Open — None Selected</div><div class="card-note">border: 2px #1957d2 · checkboxes</div></div>
+      <div class="fw">
+        <div class="fi s-focus" style="border-radius:8px 8px 0 0;">
+          <div class="fcol"><span class="flab">Label</span><span class="fval ph">Select options</span></div>
+          <div class="fsuf"><svg viewBox="0 0 16 16" style="transform:rotate(180deg)"><polyline points="3 6 8 11 13 6"/></svg></div>
+        </div>
+        <div class="dd-panel">
+          <div class="ddo"><span class="ms-cb"></span>Option 1</div>
+          <div class="ddo"><span class="ms-cb"></span>Option 2</div>
+          <div class="ddo"><span class="ms-cb"></span>Option 3</div>
+          <div class="ddo"><span class="ms-cb"></span>Option 4</div>
+          <div style="padding:8px 12px;border-top:1px solid #eee;display:flex;justify-content:flex-end;"><button style="background:#1957d2;color:#fff;border:none;border-radius:4px;padding:6px 16px;font-size:13px;font-family:var(--font-field);cursor:pointer;">Apply</button></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Open partial selection -->
+    <div class="card">
+      <div><div class="card-lbl c-blue">Open — Partial Selection</div><div class="card-note">some checked · apply to confirm</div></div>
+      <div class="fw">
+        <div class="fi s-focus" style="border-radius:8px 8px 0 0;">
+          <div class="fcol"><span class="flab">Label</span><span class="fval ph">Select options</span></div>
+          <div class="fsuf"><svg viewBox="0 0 16 16" style="transform:rotate(180deg)"><polyline points="3 6 8 11 13 6"/></svg></div>
+        </div>
+        <div class="dd-panel">
+          <div class="ddo" style="background:#f5f7ff;"><span class="ms-cb ms-on"></span><span style="color:#1957d2;">Option 1</span></div>
+          <div class="ddo"><span class="ms-cb"></span>Option 2</div>
+          <div class="ddo" style="background:#f5f7ff;"><span class="ms-cb ms-on"></span><span style="color:#1957d2;">Option 3</span></div>
+          <div class="ddo"><span class="ms-cb"></span>Option 4</div>
+          <div style="padding:8px 12px;border-top:1px solid #eee;display:flex;justify-content:flex-end;"><button style="background:#1957d2;color:#fff;border:none;border-radius:4px;padding:6px 16px;font-size:13px;font-family:var(--font-field);cursor:pointer;">Apply</button></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filled — chips inside field -->
+    <div class="card">
+      <div><div class="card-lbl">Filled — Chips</div><div class="card-note">chips inside field · each clearable</div></div>
+      <div class="fw"><div class="fi" style="min-height:56px;flex-wrap:wrap;gap:6px;align-items:center;padding:8px 12px;">
+        <div class="fcol" style="flex:0 0 100%;order:-1;"><span class="flab">Label</span></div>
+        <div class="ms-chip">Option 1<span class="ms-chip-x">×</span></div>
+        <div class="ms-chip">Option 3<span class="ms-chip-x">×</span></div>
+        <div class="fsuf" style="margin-left:auto;flex-shrink:0;"><svg viewBox="0 0 16 16" style="width:16px;height:16px;fill:none;stroke:#9aa0a6;stroke-width:2;stroke-linecap:round;"><polyline points="3 6 8 11 13 6"/></svg></div>
+      </div></div>
+    </div>
+
+    <!-- Filled many — overflow -->
+    <div class="card">
+      <div><div class="card-lbl">Filled — Overflow</div><div class="card-note">many selected → count chip</div></div>
+      <div class="fw"><div class="fi" style="min-height:56px;flex-wrap:wrap;gap:6px;align-items:center;padding:8px 12px;">
+        <div class="fcol" style="flex:0 0 100%;order:-1;"><span class="flab">Label</span></div>
+        <div class="ms-chip">Option 1<span class="ms-chip-x">×</span></div>
+        <div class="ms-chip">Option 2<span class="ms-chip-x">×</span></div>
+        <div class="ms-chip" style="background:#e8f0fe;color:#1957d2;font-weight:500;">+2 more</div>
+        <div class="fsuf" style="margin-left:auto;flex-shrink:0;"><svg viewBox="0 0 16 16" style="width:16px;height:16px;fill:none;stroke:#9aa0a6;stroke-width:2;stroke-linecap:round;"><polyline points="3 6 8 11 13 6"/></svg></div>
+      </div></div>
+    </div>
+
+    <!-- Error -->
+    <div class="card">
+      <div><div class="card-lbl c-red">Error</div><div class="card-note">border: 2px #d93025 + helper</div></div>
+      <div class="fw">
+        <div class="fi s-err">
+          <div class="fcol"><span class="flab">Label</span><span class="fval ph">Select options</span></div>
+          <div class="fsuf"><svg viewBox="0 0 16 16" style="stroke:#d93025"><polyline points="3 6 8 11 13 6"/></svg></div>
+        </div>
+        <div class="fhelp he">Please select at least one option</div>
+      </div>
+    </div>
+
+    <!-- Disabled Empty -->
+    <div class="card">
+      <div><div class="card-lbl c-muted">Disabled — Empty</div><div class="card-note">bg #f8f9fa · no selection possible</div></div>
+      <div class="fw"><div class="fi s-disabled">
+        <div class="fcol"><span class="flab">Label</span><span class="fval dis">Select options</span></div>
+        <div class="fsuf"><svg viewBox="0 0 16 16" style="stroke:#c8cdd2"><polyline points="3 6 8 11 13 6"/></svg></div>
+      </div></div>
+    </div>
+
+    <!-- Disabled Filled -->
+    <div class="card">
+      <div><div class="card-lbl c-muted">Disabled — Filled</div><div class="card-note">bg #f8f9fa · chips locked · not editable</div></div>
+      <div class="fw"><div class="fi s-disabled" style="flex-wrap:wrap;gap:6px;align-items:center;padding:8px 12px;">
+        <div class="fcol" style="flex:0 0 100%;order:-1;"><span class="flab">Label</span></div>
+        <div class="ms-chip ms-chip-dis">Option 1</div>
+        <div class="ms-chip ms-chip-dis">Option 3</div>
+        <div class="fsuf" style="margin-left:auto;flex-shrink:0;"><svg viewBox="0 0 16 16" style="width:16px;height:16px;fill:none;stroke:#c8cdd2;stroke-width:2;stroke-linecap:round;"><polyline points="3 6 8 11 13 6"/></svg></div>
+      </div></div>
+    </div>
+
+  </div>
+</section>
+
+</div><!-- /body -->
+
+<script>
+function goTo(id, el) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById(id).scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// Highlight active tab on scroll
+const sections = ['tf','pfx','srch','ta','dd','mdd'];
+const tabs = document.querySelectorAll('.tab');
+window.addEventListener('scroll', () => {
+  let current = 0;
+  sections.forEach((id, i) => {
+    const el = document.getElementById(id);
+    if (el && window.scrollY >= el.offsetTop - 160) current = i;
+  });
+  tabs.forEach((t, i) => t.classList.toggle('active', i === current));
+});
+</script>
+</body>
+</html>
