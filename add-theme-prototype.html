@@ -683,7 +683,7 @@
       text-overflow: ellipsis;
     }
 
-    .chip-x {
+    .fr.chip .chip-x {
       width: 28px;
       height: 28px;
       flex-shrink: 0;
@@ -695,15 +695,23 @@
       background: transparent;
       cursor: pointer;
       padding: 0;
+      color: #1a73e8;
+      -webkit-appearance: none;
+      appearance: none;
     }
-    .chip-x:hover { background: rgba(26, 115, 232, 0.18); }
-    .chip-x svg {
+    .fr.chip .chip-x:hover { background: rgba(26, 115, 232, 0.18); }
+    .fr.chip .chip-x:focus-visible {
+      outline: 2px solid #1a73e8;
+      outline-offset: 2px;
+    }
+    .fr.chip .chip-x svg {
       width: 12px;
       height: 12px;
       stroke: #1a73e8;
       fill: none;
       stroke-width: 2.5;
       stroke-linecap: round;
+      flex-shrink: 0;
     }
 
     .fr.is-open:not(.chip) {
@@ -1450,7 +1458,8 @@
       margin-top: 0;
       width: 100%;
     }
-    .chip {
+    /* Scoped to .chips so filter rows can use .fr.chip without inheriting keyword-pill styles */
+    .chips .chip {
       display: inline-flex;
       align-items: center;
       gap: 6px;
@@ -1461,7 +1470,7 @@
       color: var(--gray900);
       max-width: 100%;
     }
-    .chip button {
+    .chips .chip button {
       border: none;
       background: transparent;
       padding: 0;
@@ -1470,7 +1479,7 @@
       color: var(--gray300);
       line-height: 1;
     }
-    .chip button:hover { color: var(--gray900); }
+    .chips .chip button:hover { color: var(--gray900); }
     .chip-input {
       flex: 1;
       min-width: 120px;
@@ -1485,7 +1494,7 @@
       color: var(--gray90);
       opacity: 1;
     }
-    .chip.has-tip { position: relative; }
+    .chips .chip.has-tip { position: relative; }
     .tooltip {
       display: none;
       position: absolute;
@@ -1502,7 +1511,7 @@
       max-width: 220px;
       z-index: 70;
     }
-    .chip.has-tip:hover .tooltip { display: block; }
+    .chips .chip.has-tip:hover .tooltip { display: block; }
 
     .fw { display: flex; flex-direction: column; gap: 0; }
 
