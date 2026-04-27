@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Add theme — Prompts</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --gray0: #ffffff;
+      --gray10: #fafafa;
+      --gray20: #f5f5f5;
+      --gray40: #eaeaea;
+      --gray50: #e5e5e5;
+      --gray90: #8f8f8f;
+      --gray300: #555555;
+      --gray900: #212121;
+      --blue20: #ecf5fd;
+      --blue100: #1976d2;
+      --blue200: #1565b4;
+      --blue300: #125598;
+      --red200: #bf170a;
+      --shadow-md: 0 10px 24px rgba(33, 33, 33, 0.2);
+      --shadow-sm: 0 4px 8px rgba(33, 33, 33, 0.18);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: var(--gray10);
+      color: var(--gray900);
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+    }
+
+    /* —— L1 Rail (from Figma Primary Rail Nav) —— */
+    .rail {
+      width: 40px;
+      background: var(--gray0);
+      border-right: 1px solid var(--gray40);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 8px 0;
+      gap: 2px;
+      flex-shrink: 0;
+    }
+    .ri {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: default;
+      color: var(--gray90);
+    }
+    .ri svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+    .ri.active { background: var(--blue20); color: var(--blue100); }
+    .rail-spacer { flex: 1; }
+
+    /* —— L2 —— */
+    .l2 {
+      width: 220px;
+      background: var(--gray0);
+      border-right: 1px solid var(--gray40);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+    }
+    .l2-title {
+      padding: 16px 16px 12px;
+      font-size: 18px;
+      font-weight: 400;
+      color: var(--gray900);
+      border-bottom: 1px solid var(--gray40);
+    }
+    .l2-nav { padding: 8px 12px; display: flex; flex-direction: column; gap: 2px; }
+    .l2-item {
+      padding: 8px 10px;
+      border-radius: 4px;
+      font-size: 14px;
+      color: var(--gray900);
+      cursor: default;
+    }
+    .l2-item.sel { background: var(--blue20); color: var(--blue100); font-weight: 500; }
+    .l2-group-hd {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 10px;
+      font-size: 14px;
+      color: var(--gray900);
+    }
+    .l2-sub { padding-left: 8px; display: flex; flex-direction: column; gap: 2px; }
+    .l2-sub .l2-item { font-weight: 300; color: var(--gray300); }
+
+    /* —— Main shell —— */
+    .shell { flex: 1; display: flex; flex-direction: column; min-width: 0; overflow: hidden; }
+    .top-nav {
+      height: 52px;
+      background: var(--gray0);
+      border-bottom: 1px solid var(--gray40);
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding: 0 16px;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+    .top-nav .av {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: #ea8600;
+      color: #fff;
+      font-size: 11px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .top-nav svg { width: 18px; height: 18px; stroke: var(--gray90); fill: none; stroke-width: 1.8; cursor: default; }
+
+    .main-body { flex: 1; display: flex; flex-direction: column; overflow: hidden; min-height: 0; }
+    .page-hd {
+      padding: 16px 24px 12px;
+      background: var(--gray10);
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      flex-shrink: 0;
+    }
+    .page-hd h1 {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--gray900);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .page-hd h1 .info {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      border: 1px solid var(--gray50);
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--gray90);
+      font-weight: 500;
+    }
+    .hd-ctas { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+    .btn-sec {
+      height: 34px;
+      padding: 0 14px;
+      border: 1px solid var(--blue100);
+      border-radius: 4px;
+      background: var(--gray0);
+      color: var(--blue100);
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 400;
+      cursor: pointer;
+    }
+    .btn-sec:hover { background: var(--blue20); }
+    .btn-icon {
+      width: 34px;
+      height: 34px;
+      border: 1px solid var(--gray50);
+      border-radius: 4px;
+      background: var(--gray0);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: default;
+    }
+    .btn-icon svg { width: 16px; height: 16px; stroke: var(--gray90); fill: none; stroke-width: 1.8; }
+
+    .tabs {
+      display: flex;
+      gap: 0;
+      padding: 0 24px;
+      background: var(--gray10);
+      border-bottom: 1px solid var(--gray40);
+      flex-shrink: 0;
+    }
+    .tab {
+      padding: 12px 16px;
+      font-size: 16px;
+      font-weight: 500;
+      color: var(--gray900);
+      border-bottom: 3px solid transparent;
+      cursor: default;
+    }
+    .tab.active { border-bottom-color: var(--blue100); }
+
+    .scroll-main {
+      flex: 1;
+      overflow: auto;
+      padding: 20px 24px 32px;
+      background: var(--gray10);
+    }
+    .chart-card {
+      background: var(--gray0);
+      border: 1px solid var(--gray40);
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    .chart-card h2 { font-size: 14px; font-weight: 500; color: var(--gray300); margin-bottom: 8px; }
+    .chart-metric { font-size: 18px; font-weight: 500; color: var(--blue100); margin-bottom: 16px; }
+    .legend { display: flex; gap: 16px; font-size: 12px; color: var(--gray300); margin-bottom: 12px; }
+    .legend i { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; vertical-align: middle; }
+    .table-card {
+      background: var(--gray0);
+      border: 1px solid var(--gray40);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    table { width: 100%; border-collapse: collapse; }
+    th {
+      text-align: left;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--gray300);
+      padding: 10px 16px;
+      border-bottom: 1px solid var(--gray40);
+    }
+    td {
+      font-size: 14px;
+      color: var(--gray900);
+      padding: 10px 16px;
+      border-bottom: 1px solid var(--gray40);
+    }
+    tr:last-child td { border-bottom: none; }
+
+    /* —— Blanket —— */
+    .blanket {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(33, 33, 33, 0.64);
+      z-index: 40;
+    }
+    .blanket.on { display: block; }
+
+    /* —— Drawer 650px —— */
+    .drawer {
+      position: fixed;
+      top: 0;
+      right: 0;
+      width: 650px;
+      max-width: 100%;
+      height: 100%;
+      background: var(--gray0);
+      box-shadow: var(--shadow-md);
+      z-index: 50;
+      display: flex;
+      flex-direction: column;
+      transform: translateX(100%);
+      visibility: hidden;
+      transition: transform 0.22s ease, visibility 0.22s;
+    }
+    .drawer.on {
+      transform: translateX(0);
+      visibility: visible;
+    }
+
+    .dr-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 24px 24px 16px;
+      flex-shrink: 0;
+      gap: 16px;
+    }
+    .dr-header-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+    .dr-back {
+      width: 36px;
+      height: 36px;
+      border: none;
+      background: transparent;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--gray900);
+    }
+    .dr-back:hover { background: var(--gray20); }
+    .dr-back svg { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .dr-title { font-size: 18px; font-weight: 500; color: var(--gray900); }
+    .dr-ctas { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+    .btn-cancel {
+      border: none;
+      background: transparent;
+      color: var(--blue100);
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 400;
+      padding: 8px 12px;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+    .btn-cancel:hover { background: var(--blue20); }
+    .btn-add {
+      border: none;
+      background: var(--blue200);
+      color: var(--gray0);
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 500;
+      padding: 8px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .btn-add:hover:not(:disabled) { background: var(--blue300); }
+    .btn-add:disabled {
+      background: var(--gray50);
+      color: var(--gray90);
+      cursor: not-allowed;
+    }
+
+    .dr-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 8px 24px 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* —— Floating fields (.iw / .iw-inner / .fl) — newfields_contacts pattern —— */
+    .field-label-hint {
+      font-size: 12px;
+      color: var(--gray90);
+      margin-bottom: 6px;
+      line-height: 1.4;
+    }
+    .req { color: var(--red200); font-weight: 500; margin-left: 2px; }
+
+    .iw {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid var(--gray50);
+      border-radius: 4px;
+      background: var(--gray20);
+      padding: 6px 12px;
+      min-height: 44px;
+      transition: border-color 0.15s, padding 0.15s, background 0.15s;
+    }
+    .iw:focus-within {
+      border-color: var(--blue100);
+      border-width: 2px;
+      padding: 5px 11px;
+      background: var(--gray0);
+    }
+    .iw-inner {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-width: 0;
+      justify-content: center;
+    }
+    .fl-row { display: flex; align-items: baseline; gap: 2px; margin-bottom: 1px; }
+    .iw-inner .fl {
+      font-size: 10px;
+      color: var(--gray90);
+      font-weight: 400;
+      line-height: 1.3;
+    }
+    .iw:focus-within .iw-inner .fl { color: var(--blue100); }
+    .iw-inner input,
+    .iw-inner .dd-display {
+      border: none;
+      outline: none;
+      font-family: 'Poppins', sans-serif;
+      font-size: 14px;
+      color: var(--gray900);
+      background: transparent;
+      width: 100%;
+      padding: 0;
+    }
+    .iw-inner .dd-display.is-placeholder { color: var(--gray90); }
+    .iw .chev {
+      flex-shrink: 0;
+      width: 20px;
+      height: 20px;
+      stroke: var(--gray90);
+      fill: none;
+      stroke-width: 2;
+      pointer-events: none;
+    }
+    .iw-dd { cursor: pointer; }
+    .iw-dd.open { border-color: var(--blue100); border-width: 2px; padding: 5px 11px; background: var(--gray0); }
+    .dd-wrap { position: relative; }
+    .dd-menu {
+      display: none;
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: calc(100% + 4px);
+      background: var(--gray0);
+      border-radius: 4px;
+      box-shadow: var(--shadow-sm);
+      max-height: 280px;
+      overflow-y: auto;
+      z-index: 60;
+      padding: 12px 0;
+    }
+    .dd-menu.open { display: block; }
+    .dd-search {
+      margin: 0 16px 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid var(--gray50);
+      border-radius: 4px;
+      padding: 8px 12px;
+      height: 40px;
+    }
+    .dd-search svg { width: 18px; height: 18px; stroke: var(--gray90); flex-shrink: 0; }
+    .dd-search input {
+      border: none;
+      outline: none;
+      flex: 1;
+      font-family: inherit;
+      font-size: 14px;
+    }
+    .dd-title { font-size: 12px; font-weight: 500; color: var(--gray300); padding: 8px 20px 4px 16px; }
+    .dd-opt {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 8px 12px 8px 16px;
+      cursor: pointer;
+      font-size: 14px;
+      color: var(--gray300);
+    }
+    .dd-opt:hover { background: var(--gray20); }
+    .dd-opt.disabled {
+      color: var(--gray90);
+      cursor: not-allowed;
+      background: transparent;
+    }
+    .dd-opt .sub { font-size: 12px; color: var(--gray90); display: block; margin-top: 2px; }
+    .dd-opt .cb {
+      width: 18px;
+      height: 18px;
+      border: 1px solid var(--gray50);
+      border-radius: 3px;
+      flex-shrink: 0;
+      margin-top: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .dd-opt.selected .cb {
+      background: var(--blue100);
+      border-color: var(--blue100);
+    }
+    .dd-opt.selected .cb svg { display: block; width: 10px; height: 10px; stroke: #fff; stroke-width: 2.5; fill: none; }
+    .dd-opt .cb svg { display: none; }
+
+    /* Keywords chip area */
+    .iw-keywords { align-items: flex-start; min-height: 56px; }
+    .iw-keywords .iw-inner { padding-top: 2px; }
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+      margin-top: 4px;
+    }
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 8px;
+      background: var(--gray40);
+      border-radius: 4px;
+      font-size: 13px;
+      color: var(--gray900);
+      max-width: 100%;
+    }
+    .chip button {
+      border: none;
+      background: transparent;
+      padding: 0;
+      cursor: pointer;
+      display: flex;
+      color: var(--gray300);
+      line-height: 1;
+    }
+    .chip button:hover { color: var(--gray900); }
+    .chip-input {
+      flex: 1;
+      min-width: 120px;
+      border: none;
+      outline: none;
+      font-family: inherit;
+      font-size: 14px;
+      padding: 4px 0;
+    }
+    .chip.has-tip { position: relative; }
+    .tooltip {
+      display: none;
+      position: absolute;
+      left: 0;
+      bottom: calc(100% + 8px);
+      background: #252525;
+      color: #fff;
+      font-size: 12px;
+      line-height: 18px;
+      padding: 4px 8px;
+      border-radius: 4px;
+      box-shadow: var(--shadow-sm);
+      width: max-content;
+      max-width: 220px;
+      z-index: 70;
+    }
+    .chip.has-tip:hover .tooltip { display: block; }
+
+    /* Proto state toolbar (for matching 7 Figma frames) */
+    .proto-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: var(--gray900);
+      color: var(--gray0);
+      font-size: 11px;
+      padding: 8px 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      z-index: 100;
+    }
+    .proto-bar span { opacity: 0.8; margin-right: 8px; }
+    .proto-bar button {
+      background: #454545;
+      border: 1px solid #656565;
+      color: #fff;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 11px;
+    }
+    .proto-bar button:hover { background: #555; }
+    .proto-bar button.active { background: var(--blue100); border-color: var(--blue100); }
+  </style>
+</head>
+<body>
+  <aside class="rail" aria-label="Primary navigation">
+    <div class="ri"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
+    <div class="ri"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div>
+    <div class="ri active"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
+    <div class="ri"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
+    <div class="rail-spacer"></div>
+    <div class="ri"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/></svg></div>
+  </aside>
+
+  <nav class="l2" aria-label="Section navigation">
+    <div class="l2-title">Search AI</div>
+    <div class="l2-nav">
+      <div class="l2-item sel">Prompts</div>
+      <div class="l2-item">Citations</div>
+      <div class="l2-item">Visibility</div>
+      <div class="l2-group-hd">Rankings <svg width="12" height="12" viewBox="0 0 12 12" stroke="currentColor" fill="none" stroke-width="2"><path d="M3 4.5l3 3 3-3"/></svg></div>
+      <div class="l2-sub">
+        <div class="l2-item">Brand</div>
+        <div class="l2-item">Local</div>
+      </div>
+      <div class="l2-item">Accuracy</div>
+      <div class="l2-item">Sentiment</div>
+    </div>
+  </nav>
+
+  <div class="shell">
+    <header class="top-nav">
+      <svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="8"/><line x1="10" y1="14" x2="10" y2="10"/><line x1="10" y1="7" x2="10.01" y2="7"/></svg>
+      <div class="av">RS</div>
+      <svg viewBox="0 0 20 20"><line x1="3" y1="6" x2="17" y2="6"/><line x1="3" y1="10" x2="17" y2="10"/><line x1="3" y1="14" x2="17" y2="14"/></svg>
+    </header>
+
+    <div class="main-body">
+      <div class="page-hd">
+        <h1>Prompts <span class="info" title="About prompts">i</span></h1>
+        <div class="hd-ctas">
+          <button type="button" class="btn-sec" id="btnAddTheme">Add theme</button>
+          <div class="btn-icon" aria-hidden="true"><svg viewBox="0 0 16 16"><circle cx="8" cy="4" r="1.2" fill="currentColor" stroke="none"/><circle cx="8" cy="8" r="1.2" fill="currentColor" stroke="none"/><circle cx="8" cy="12" r="1.2" fill="currentColor" stroke="none"/></svg></div>
+          <div class="btn-icon" aria-hidden="true"><svg viewBox="0 0 18 18"><line x1="2" y1="5" x2="16" y2="5"/><line x1="5" y1="9" x2="13" y2="9"/><line x1="7" y1="13" x2="11" y2="13"/></svg></div>
+        </div>
+      </div>
+      <div class="tabs">
+        <div class="tab active">Themes</div>
+        <div class="tab">Questions</div>
+      </div>
+      <div class="scroll-main">
+        <div class="chart-card">
+          <h2>Which themes are most searched for all locations</h2>
+          <p class="chart-metric">dental bridge</p>
+          <div class="legend">
+            <span><i style="background:#7fb8f0"></i>Tracking</span>
+            <span><i style="background:#ccc"></i>Not tracking</span>
+          </div>
+        </div>
+        <div class="table-card">
+          <table>
+            <thead>
+              <tr><th>Theme</th><th>Monthly searches</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>emergency dentist</td><td>14.5k</td></tr>
+              <tr><td>Root canal</td><td>12.1k</td></tr>
+              <tr><td>Family dentist</td><td>8.4k</td></tr>
+              <tr><td>Dental crown</td><td>5.2k</td></tr>
+              <tr><td>Teeth cleaning</td><td>1.1k</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="blanket" id="blanket" aria-hidden="true"></div>
+
+  <aside class="drawer" id="drawer" role="dialog" aria-labelledby="drTitle" aria-modal="true">
+    <div class="dr-header">
+      <div class="dr-header-left">
+        <button type="button" class="dr-back" id="drBack" aria-label="Close drawer">
+          <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+        </button>
+        <h2 class="dr-title" id="drTitle">Add theme</h2>
+      </div>
+      <div class="dr-ctas">
+        <button type="button" class="btn-cancel" id="btnCancel">Cancel</button>
+        <button type="button" class="btn-add" id="btnAdd" disabled>Add</button>
+      </div>
+    </div>
+    <div class="dr-body">
+      <p class="field-label-hint">Fields marked with <span class="req">*</span> are required.</p>
+
+      <div>
+        <div class="iw" id="themeIw">
+          <div class="iw-inner">
+            <div class="fl-row">
+              <span class="fl">Theme name</span><span class="req">*</span>
+            </div>
+            <input type="text" id="themeInput" autocomplete="off" />
+          </div>
+        </div>
+      </div>
+
+      <div class="dd-wrap">
+        <div class="iw iw-dd" id="locTrigger" tabindex="0" role="button" aria-expanded="false" aria-haspopup="listbox">
+          <div class="iw-inner">
+            <div class="fl-row">
+              <span class="fl">Locations</span><span class="req">*</span>
+            </div>
+            <div class="dd-display is-placeholder" id="locDisplay">Select locations</div>
+          </div>
+          <svg class="chev" viewBox="0 0 16 16"><path d="M4 6l4 4 4-4"/></svg>
+        </div>
+        <div class="dd-menu" id="locMenu" role="listbox">
+          <div class="dd-title">Location</div>
+          <div class="dd-search">
+            <svg viewBox="0 0 18 18"><circle cx="8" cy="8" r="5.5"/><line x1="12.5" y1="12.5" x2="16" y2="16"/></svg>
+            <input type="search" id="locSearch" />
+          </div>
+          <div id="locOpts"></div>
+        </div>
+      </div>
+
+      <div>
+        <div class="iw iw-keywords" id="kwIw">
+          <div class="iw-inner" style="flex:1">
+            <div class="fl-row">
+              <span class="fl">Keywords &amp; their monthly searches</span><span class="req">*</span>
+            </div>
+            <div class="chips" id="chips">
+              <input class="chip-input" id="chipInput" type="text" autocomplete="off" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <div class="proto-bar" aria-label="Prototype frame presets">
+    <span>Figma frames</span>
+    <button type="button" data-state="1">1 Empty</button>
+    <button type="button" data-state="2">2 Theme focus</button>
+    <button type="button" data-state="3">3 Theme filled</button>
+    <button type="button" data-state="4">4 Location</button>
+    <button type="button" data-state="5">5 Tooltip</button>
+    <button type="button" data-state="6">6 Keywords</button>
+    <button type="button" data-state="7">7 Add on</button>
+  </div>
+
+  <script>
+(function () {
+  var LOCATIONS = [
+    { id: 'all', name: 'All', sub: 'All locations', count: 6 },
+    { id: 'atl', name: 'Atlanta', sub: '3 themes' },
+    { id: 'ala', name: 'Alabama', sub: '4 themes' },
+    { id: 'asp', name: 'Aspen', sub: '3 themes' },
+    { id: 'bah', name: 'Bahama', sub: '1 theme' },
+    { id: 'bar', name: 'Barca', sub: '5 themes', disabled: true, tip: 'This location is already tracking 5 themes' }
+  ];
+
+  var drawer = document.getElementById('drawer');
+  var blanket = document.getElementById('blanket');
+  var themeInput = document.getElementById('themeInput');
+  var locTrigger = document.getElementById('locTrigger');
+  var locMenu = document.getElementById('locMenu');
+  var locDisplay = document.getElementById('locDisplay');
+  var locSearch = document.getElementById('locSearch');
+  var locOpts = document.getElementById('locOpts');
+  var chips = document.getElementById('chips');
+  var chipInput = document.getElementById('chipInput');
+  var btnAdd = document.getElementById('btnAdd');
+  var btnAddTheme = document.getElementById('btnAddTheme');
+  var btnCancel = document.getElementById('btnCancel');
+  var drBack = document.getElementById('drBack');
+
+  var selectedLocId = null;
+  var chipList = [];
+
+  function renderLocOptions() {
+    var q = (locSearch.value || '').toLowerCase();
+    locOpts.innerHTML = '';
+    LOCATIONS.forEach(function (L) {
+      if (q && L.name.toLowerCase().indexOf(q) === -1 && (L.sub || '').toLowerCase().indexOf(q) === -1) return;
+      var row = document.createElement('div');
+      row.className = 'dd-opt' + (L.disabled ? ' disabled' : '') + (selectedLocId === L.id ? ' selected' : '');
+      row.setAttribute('role', 'option');
+      row.dataset.id = L.id;
+      row.innerHTML =
+        '<div class="cb">' +
+        '<svg viewBox="0 0 10 10"><polyline points="1 5 4 8 9 2"/></svg></div>' +
+        '<div><span>' + L.name + '</span>' + (L.sub ? '<span class="sub">' + L.sub + '</span>' : '') + '</div>';
+      if (!L.disabled) {
+        row.addEventListener('click', function () {
+          selectedLocId = L.id;
+          if (L.id === 'all') locDisplay.textContent = '6 locations';
+          else locDisplay.textContent = L.name;
+          locDisplay.classList.remove('is-placeholder');
+          closeLocMenu();
+          renderLocOptions();
+          validate();
+        });
+      }
+      locOpts.appendChild(row);
+    });
+  }
+
+  function openLocMenu() {
+    locMenu.classList.add('open');
+    locTrigger.classList.add('open');
+    locTrigger.setAttribute('aria-expanded', 'true');
+  }
+  function closeLocMenu() {
+    locMenu.classList.remove('open');
+    locTrigger.classList.remove('open');
+    locTrigger.setAttribute('aria-expanded', 'false');
+  }
+
+  function renderChips() {
+    var nodes = chips.querySelectorAll('.chip');
+    nodes.forEach(function (n) { n.remove(); });
+    chipList.forEach(function (text) {
+      var wrap = document.createElement('span');
+      var showTip = text === 'Dental trauma treatment';
+      wrap.className = 'chip' + (showTip ? ' has-tip' : '');
+      wrap.innerHTML =
+        '<span>' + escapeHtml(text) + '</span>' +
+        (showTip ? '<span class="tooltip" role="tooltip">This location is already tracking 5 themes</span>' : '') +
+        '<button type="button" aria-label="Remove keyword">&times;</button>';
+      wrap.querySelector('button').addEventListener('click', function () {
+        var i = chipList.indexOf(text);
+        if (i !== -1) chipList.splice(i, 1);
+        renderChips();
+        validate();
+      });
+      chips.insertBefore(wrap, chipInput);
+    });
+  }
+
+  function escapeHtml(s) {
+    var d = document.createElement('div');
+    d.textContent = s;
+    return d.innerHTML;
+  }
+
+  function validate() {
+    var ok = themeInput.value.trim().length > 0 && selectedLocId && chipList.length > 0;
+    btnAdd.disabled = !ok;
+  }
+
+  function openDrawer() {
+    drawer.classList.add('on');
+    blanket.classList.add('on');
+    blanket.setAttribute('aria-hidden', 'false');
+  }
+  function closeDrawer() {
+    drawer.classList.remove('on');
+    blanket.classList.remove('on');
+    blanket.setAttribute('aria-hidden', 'true');
+    closeLocMenu();
+  }
+
+  btnAddTheme.addEventListener('click', openDrawer);
+  btnCancel.addEventListener('click', closeDrawer);
+  drBack.addEventListener('click', closeDrawer);
+  blanket.addEventListener('click', closeDrawer);
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && drawer.classList.contains('on')) closeDrawer();
+  });
+
+  locTrigger.addEventListener('click', function (e) {
+    e.stopPropagation();
+    if (locMenu.classList.contains('open')) closeLocMenu();
+    else openLocMenu();
+  });
+  locSearch.addEventListener('input', renderLocOptions);
+  locSearch.addEventListener('click', function (e) { e.stopPropagation(); });
+
+  document.addEventListener('click', function () {
+    closeLocMenu();
+  });
+  locMenu.addEventListener('click', function (e) { e.stopPropagation(); });
+
+  themeInput.addEventListener('input', validate);
+  themeInput.addEventListener('focus', validate);
+
+  chipInput.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      var v = chipInput.value.trim();
+      if (v) {
+        chipList.push(v);
+        chipInput.value = '';
+        renderChips();
+        validate();
+      }
+    }
+  });
+
+  btnAdd.addEventListener('click', function () {
+    if (!btnAdd.disabled) closeDrawer();
+  });
+
+  /* —— Presets matching Figma node order —— */
+  function setProtoState(n) {
+    document.querySelectorAll('.proto-bar button').forEach(function (b) {
+      b.classList.toggle('active', b.getAttribute('data-state') === String(n));
+    });
+    openDrawer();
+    themeInput.value = '';
+    selectedLocId = null;
+    locDisplay.textContent = 'Select locations';
+    locDisplay.classList.add('is-placeholder');
+    chipList = [];
+    chipInput.value = '';
+    renderChips();
+    renderLocOptions();
+
+    if (n >= 3) themeInput.value = 'Emergency Dentist';
+    if (n >= 4) {
+      selectedLocId = 'all';
+      locDisplay.textContent = '6 locations';
+    }
+    if (n >= 6) {
+      chipList = [
+        'Emergency dental care',
+        'Same day appointments',
+        'Toothache relief',
+        'Urgent dental services',
+        'Dental trauma treatment',
+        '24/7 dentist availability',
+        'Wisdom tooth extraction',
+        'Crown repair services',
+        'Root canal emergencies'
+      ];
+    }
+    if (n === 5) {
+      chipList = ['Emergency dental care', 'Dental trauma treatment'];
+    }
+    renderChips();
+    renderLocOptions();
+    validate();
+
+    if (n === 2) setTimeout(function () { themeInput.focus(); }, 200);
+    if (n === 7) validate();
+  }
+
+  document.querySelectorAll('.proto-bar button').forEach(function (b) {
+    b.addEventListener('click', function () {
+      setProtoState(parseInt(b.getAttribute('data-state'), 10));
+    });
+  });
+
+  locSearch.setAttribute('aria-label', 'Search location');
+  renderLocOptions();
+  validate();
+})();
+  </script>
+</body>
+</html>
