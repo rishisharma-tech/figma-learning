@@ -542,7 +542,7 @@
     }
     .fp-title {
       font-size: 15px;
-      font-weight: 700;
+      font-weight: 500;
       color: #212121;
       letter-spacing: -0.24px;
       line-height: 1.25;
@@ -600,31 +600,31 @@
     .fp-list {
       display: flex;
       flex-direction: column;
-      gap: 8px;
-      padding: 6px 20px 14px;
+      gap: 5px;
+      padding: 6px 12px 16px;
     }
 
-    /* filter row — filter-prototype.html */
+    /* filter row — aligned with final_proto.html (Contacts filter panel) */
     .fr {
-      border-radius: 6px;
+      border-radius: 7px;
       border: 1px solid #dadce0;
       background: #fff;
       cursor: pointer;
       overflow: hidden;
-      transition: border-color 0.15s;
+      transition: border-color 0.12s;
     }
     .fr:not(.chip):hover { border-color: #9aa0a6; }
     .fr-hd {
       display: flex;
       align-items: center;
-      gap: 6px;
-      padding: 5px 10px;
-      min-height: 36px;
+      gap: 8px;
+      padding: 0 11px;
+      height: 42px;
       box-sizing: border-box;
     }
     .fr-lbl {
       font-size: 13px;
-      color: #80868b;
+      color: #3c4043;
       flex: 1;
       min-width: 0;
       white-space: nowrap;
@@ -634,9 +634,9 @@
       line-height: 1.25;
     }
     .fr-chv svg {
-      width: 16px;
-      height: 16px;
-      stroke: #5f6368;
+      width: 15px;
+      height: 15px;
+      stroke: #9aa0a6;
       fill: none;
       stroke-width: 2;
       stroke-linecap: round;
@@ -644,47 +644,48 @@
       transition: transform 0.18s;
     }
 
+    /* applied filter chip — light blue fill, blue border, grey label + bold blue summary */
     .fr.chip {
-      border-color: #dadce0;
-      border-width: 1px;
-      background: #fff;
+      border: 1px solid #1a73e8;
+      background: #e8f0fe;
+      cursor: default;
     }
     .fr.chip .fr-hd {
-      padding: 5px 10px;
+      padding: 8px 10px;
       height: auto;
-      min-height: 36px;
+      min-height: 44px;
       align-items: center;
+      gap: 10px;
     }
     .fr.chip .fr-body-col {
       display: flex;
       flex-direction: column;
       flex: 1;
       min-width: 0;
-      justify-content: center;
+      gap: 2px;
     }
     .fr.chip .fr-float-label {
-      font-size: 11px;
-      color: #9aa0a6;
+      font-size: 12px;
+      color: #5f6368;
       font-weight: 400;
-      margin-bottom: 1px;
-      line-height: 1.25;
+      margin-bottom: 0;
+      line-height: 1.3;
       text-transform: none;
       letter-spacing: 0;
     }
     .fr.chip .fr-lbl {
-      color: #1a1a1a;
+      color: #1a73e8;
       font-weight: 600;
-      font-size: 13px;
+      font-size: 14px;
+      line-height: 1.35;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      line-height: 1.35;
     }
-    .fr.chip .fr-chv svg { stroke: #5f6368; }
 
     .chip-x {
-      width: 22px;
-      height: 22px;
+      width: 28px;
+      height: 28px;
       flex-shrink: 0;
       border-radius: 50%;
       display: flex;
@@ -695,13 +696,13 @@
       cursor: pointer;
       padding: 0;
     }
-    .chip-x:hover { background: rgba(0, 0, 0, 0.07); }
+    .chip-x:hover { background: rgba(26, 115, 232, 0.18); }
     .chip-x svg {
-      width: 13px;
-      height: 13px;
-      stroke: #5f6368;
+      width: 12px;
+      height: 12px;
+      stroke: #1a73e8;
       fill: none;
-      stroke-width: 2;
+      stroke-width: 2.5;
       stroke-linecap: round;
     }
 
@@ -711,11 +712,11 @@
       background: #fff;
     }
     .fr.is-open:not(.chip) .fr-hd {
-      padding: 5px 10px;
-      min-height: 36px;
+      padding: 0 11px;
+      height: 42px;
     }
     .fr.is-open:not(.chip) .fr-lbl {
-      font-size: 11px;
+      font-size: 13px;
       color: #1a73e8;
       font-weight: 500;
       text-transform: none;
@@ -2172,6 +2173,19 @@
     if (fltSelected[label].size === 0) delete fltSelected[label];
   }
 
+  /** Same summary rules as final_proto.html (e.g. “3 regions”, “N selected” for compound labels). */
+  function filterChipSummary(label, count, sel) {
+    if (count === 1) return Array.from(sel)[0];
+    if (/\s/.test(label.trim())) return count + ' selected';
+    var w = label.trim().toLowerCase();
+    var plural =
+      w.length > 1 && w.endsWith('y') && 'aeiou'.indexOf(w[w.length - 2]) === -1
+        ? w.slice(0, -1) + 'ies'
+        : w + 's';
+    if (plural === w + 's' && w.endsWith('s')) return count + ' selected';
+    return count + ' ' + plural;
+  }
+
   function renderThemeFilters() {
     var q = fltSearchQuery.toLowerCase();
     var list = THEME_FILTERS.filter(function (f) {
@@ -2182,9 +2196,7 @@
       var hasVal = sel && sel.size > 0;
       var isOpen = openFltLabel === f.label;
       var cnt = hasVal ? sel.size : 0;
-      /* filter-prototype uses “N {label}s”; avoid double-s (“statuss”) — use “N selected” when plural */
-      var chipText =
-        cnt === 1 ? Array.from(sel)[0] : cnt + ' selected';
+      var chipText = hasVal ? filterChipSummary(f.label, cnt, sel) : '';
 
       var cbRows = f.options
         .map(function (opt) {
