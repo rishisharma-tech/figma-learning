@@ -1,0 +1,243 @@
+/* ============================================================
+   Aero Design System — CSS tokens (Elemental / Birdeye)
+
+   Source of truth for values: RISHI-AERO-DS-TOKENS.md
+   Use those names when designing; consume --aero-* or --ds-* here.
+   Do not introduce ad-hoc hex in pages when a token exists.
+
+   Figma (legacy ref): xecPAre4cKkeXEdvTig1oI
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap');
+
+:root {
+
+  /* ── TYPOGRAPHY (RISHI) ───────────────────────────────── */
+  --aero-font-family:     'Poppins', sans-serif;
+  --aero-font-mono:       'SFMono-Regular', ui-monospace, Menlo, Monaco, monospace;
+
+  --aero-fs-10:  10px;
+  --aero-fs-12:  12px;
+  --aero-fs-14:  14px;
+  --aero-fs-16:  16px;
+  --aero-fs-18:  18px;
+  --aero-fs-20:  20px;
+  --aero-fs-24:  24px;
+  --aero-fs-28:  28px;
+  --aero-fs-32:  32px;
+
+  --aero-fw-regular: 400;
+  --aero-fw-medium:  500;
+  --aero-fw-bold:    700;
+
+  --aero-lh-10: 15px;
+  --aero-lh-12: 18px;
+  --aero-lh-14: 21px;
+  --aero-lh-16: 24px;
+  --aero-lh-18: 27px;
+  --aero-lh-20: 30px;
+  --aero-lh-24: 36px;
+  --aero-lh-28: 42px;
+  --aero-lh-32: 48px;
+
+  /* Legacy DS aliases — typography */
+  --ds-font-family:         var(--aero-font-family);
+  --ds-font-size-xs:       11px;
+  --ds-font-size-sm:       var(--aero-fs-12);
+  --ds-font-size-base:     var(--aero-fs-14);
+  --ds-font-size-md:       var(--aero-fs-16);
+  --ds-font-size-lg:       var(--aero-fs-18);
+  --ds-font-size-xl:       var(--aero-fs-20);
+  --ds-font-weight-regular: var(--aero-fw-regular);
+  --ds-font-weight-medium:  var(--aero-fw-medium);
+  --ds-font-weight-semibold: 600;
+  --ds-font-weight-bold:    var(--aero-fw-bold);
+  /* Aliases for RISHI font-size tokens (use in new CSS) */
+  --aero-font-size-10: var(--aero-fs-10);
+  --aero-font-size-12: var(--aero-fs-12);
+  --aero-font-size-14: var(--aero-fs-14);
+  --aero-font-size-16: var(--aero-fs-16);
+  --aero-font-size-18: var(--aero-fs-18);
+  --aero-font-size-20: var(--aero-fs-20);
+  --aero-font-size-24: var(--aero-fs-24);
+  --aero-font-size-28: var(--aero-fs-28);
+  --aero-font-size-32: var(--aero-fs-32);
+
+  /* ── GRAY (RISHI) ─────────────────────────────────────── */
+  --aero-gray-0:    #ffffff;
+  --aero-gray-10:   #fafafa;
+  --aero-gray-20:   #f5f5f5;
+  --aero-gray-30:   #efefef;
+  --aero-gray-40:   #eaeaea;
+  --aero-gray-50:   #e5e5e5;
+  --aero-gray-60:   #cccccc;
+  --aero-gray-70:   #b8b8b8;
+  --aero-gray-80:   #a3a3a3;
+  --aero-gray-90:   #8f8f8f;
+  --aero-gray-100:  #757575;
+  --aero-gray-200:  #656565;
+  --aero-gray-300:  #555555;
+  --aero-gray-400:  #454545;
+  --aero-gray-500:  #353535;
+  --aero-gray-600:  #303030;
+  --aero-gray-900:  #212121;
+  --aero-gray-1000: #2c3e50;
+  --aero-gray-2000: #e5e9f0;
+
+  /* ── BLUE (RISHI) ───────────────────────────────────── */
+  --aero-blue-10:  #f6fafe;
+  --aero-blue-20:  #ecf5fd;
+  --aero-blue-30:  #e3effc;
+  --aero-blue-40:  #daeafb;
+  --aero-blue-50:  #d1e5f9;
+  --aero-blue-60:  #a4ccf4;
+  --aero-blue-70:  #7fb8f0;
+  --aero-blue-80:  #5ba4ec;
+  --aero-blue-90:  #3790e7;
+  --aero-blue-100: #1976d2;
+  --aero-blue-200: #1565b4;
+  --aero-blue-300: #125598;
+  --aero-blue-400: #0f457c;
+  --aero-blue-500: #0b355f;
+  --aero-blue-900: #07213a;
+
+  /* ── RED (RISHI) ─────────────────────────────────────── */
+  --aero-red-10:  #fef6f5;
+  --aero-red-20:  #feeceb;
+  --aero-red-30:  #fde3e1;
+  --aero-red-70:  #f88078;
+  --aero-red-80:  #f65d51;
+  --aero-red-90:  #f3382b;
+  --aero-red-100: #de1b0c;
+  --aero-red-200: #bf170a;
+
+  /* ── GREEN (RISHI) ───────────────────────────────────── */
+  --aero-green-10:  #f8fcf7;
+  --aero-green-20:  #f1faf0;
+  --aero-green-50:  #dcf1d9;
+  --aero-green-90:  #68c559;
+  --aero-green-100: #4cae3d;
+  --aero-green-200: #419535;
+
+  /* ── YELLOW (RISHI) ──────────────────────────────────── */
+  --aero-yellow-10:  #fffcf5;
+  --aero-yellow-20:  #fff9ea;
+  --aero-yellow-50:  #fef1cc;
+  --aero-yellow-90:  #fbc123;
+  --aero-yellow-100: #e6aa04;
+  --aero-yellow-200: #c69204;
+
+  /* ── SPACING (RISHI margin/padding scale) ─────────────── */
+  --aero-md-0:  0px;
+  --aero-md-2:  2px;
+  --aero-md-4:  4px;
+  --aero-md-8:  8px;
+  --aero-md-12: 12px;
+  --aero-md-16: 16px;
+  --aero-md-20: 20px;
+  --aero-md-24: 24px;
+  --aero-pd-0:  0px;
+  --aero-pd-2:  2px;
+  --aero-pd-4:  4px;
+  --aero-pd-8:  8px;
+  --aero-pd-12: 12px;
+  --aero-pd-16: 16px;
+  --aero-pd-20: 20px;
+  --aero-pd-24: 24px;
+
+  /* ── RADIUS (RISHI) ─────────────────────────────────── */
+  --aero-radius-xs:   2px;
+  --aero-radius-sm:   4px;
+  --aero-radius-md:   8px;
+  --aero-radius-lg:  12px;
+  --aero-radius-xl:  16px;
+  --aero-radius-xxl: 24px;
+  --aero-radius-pill: 999px;
+
+  /* ── Legacy semantic --ds-color-* (map to RISHI) ────── */
+  --ds-color-bg-page:       var(--aero-gray-10);
+  --ds-color-bg-surface:    var(--aero-gray-0);
+  --ds-color-bg-subtle:     var(--aero-gray-10);
+  --ds-color-bg-muted:      var(--aero-gray-20);
+  --ds-color-text-primary:  var(--aero-gray-900);
+  --ds-color-text-secondary: var(--aero-gray-300);
+  --ds-color-text-muted:     var(--aero-gray-90);
+  --ds-color-text-icon:      var(--aero-gray-600);
+
+  /* Default border: RISHI $gray50; subtle: $gray40 */
+  --ds-color-border:         var(--aero-gray-50);
+  --ds-color-border-strong:  var(--aero-gray-50);
+  --ds-color-border-subtle:    var(--aero-gray-40);
+  --ds-color-border-input:   var(--aero-gray-2000);
+
+  /* Primary / interactive (links: blue100; buttons per RISHI: blue200 + hover blue300) */
+  --ds-color-blue-primary:   var(--aero-blue-100);
+  --ds-color-blue-100:       var(--aero-blue-100);
+  --ds-color-blue-200:       var(--aero-blue-200);
+  --ds-color-blue-300:       var(--aero-blue-300);
+  --ds-color-blue-90:        var(--aero-blue-90);
+  --ds-color-blue-selected:  var(--aero-blue-20);
+  --ds-color-blue-dark:      var(--aero-blue-300);
+  /* Primary CTA / filled button (RISHI: $blue200, hover $blue300) */
+  --ds-color-button-primary:       var(--aero-blue-200);
+  --ds-color-button-primary-hover: var(--aero-blue-300);
+
+  --ds-color-rail-bg:       var(--aero-gray-2000);
+
+  --ds-color-success:        var(--aero-green-100);
+  --ds-color-success-bg:     var(--aero-green-20);
+  --ds-color-danger:         var(--aero-red-90);
+  --ds-color-danger-bg:      var(--aero-red-20);
+  --ds-color-warning:        var(--aero-yellow-100);
+  /* legacy badge red — align to RISHI red */
+  --ds-color-badge:          #ef4444;
+
+  /* Legacy --ds-space-* → RISHI md */
+  --ds-space-1:  var(--aero-md-4);
+  --ds-space-2:  var(--aero-md-8);
+  --ds-space-3:  var(--aero-md-12);
+  --ds-space-4:  var(--aero-md-16);
+  --ds-space-5:  var(--aero-md-20);
+  --ds-space-6:  var(--aero-md-24);
+
+  /* Legacy radii */
+  --ds-radius-sm:   var(--aero-radius-sm);
+  --ds-radius-md:   6px;
+  --ds-radius-lg:   var(--aero-radius-lg);
+  --ds-radius-full: var(--aero-radius-pill);
+  /* Card / panel radius per RISHI $mdBorderRadius 8px */
+  --ds-radius-card: var(--aero-radius-md);
+
+  /* ── COMPONENT HEIGHTS ── */
+  --ds-height-topnav:   52px;
+  --ds-height-row-sm:   24px;
+  --ds-height-row-md:   28px;
+  --ds-height-row-lg:   37px;
+  --ds-height-page-hdr: 52px;
+
+  /* ── COMPONENT WIDTHS ── */
+  --ds-width-rail:    56px;
+  --ds-width-sidebar: 222px;
+  --ds-width-icon:    20px;
+  --ds-width-btn:     28px;
+
+  /* ── SHADOWS ── */
+  --ds-shadow-panel: -4px 0 24px rgba(0,0,0,0.08);
+  --ds-shadow-card:  0 1px 3px rgba(0,0,0,0.08);
+
+  /* Material Symbols Outlined — load in HTML
+     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:..."/> */
+  --ds-icon-size: 20px;
+}
+
+/* Poppins = primary UI (RISHI). Form controls inherit. */
+html {
+  font-family: var(--aero-font-family);
+}
+button,
+input,
+optgroup,
+select,
+textarea {
+  font-family: inherit;
+}

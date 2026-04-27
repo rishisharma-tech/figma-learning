@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Reports – Reviews & ratings over time</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap"/>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20,400,0,0&display=block"/>
+<script src="./chart.umd.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Roboto',sans-serif;background:rgb(242,242,242);height:100vh;overflow:hidden;color:rgb(33,33,33);font-size:14px}
+.material-symbols-outlined{font-size:20px;line-height:1;user-select:none}
+
+/* ── LAYOUT ── */
+.body-wrap{display:flex;height:100vh;overflow:hidden}
+
+/* ── RAIL (L1) ── */
+.rail{width:56px;background:rgb(229,233,240);border-right:none;display:flex;flex-direction:column;align-items:center;padding:0;gap:0;flex-shrink:0}
+.rail-logo-area{width:56px;height:52px;background:rgb(229,233,240);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.rail-logo-area svg{width:28px;height:28px}
+.rail-nav{flex:1;width:56px;background:rgb(229,233,240);display:flex;flex-direction:column;align-items:center;padding:8px 12px;gap:8px;overflow:hidden}
+.rail-btn{width:28px;height:28px;border-radius:4px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:rgb(48,48,48);position:relative;flex-shrink:0}
+.rail-btn:hover{background:rgba(0,0,0,0.06)}
+.rail-btn.active{background:rgb(199,214,246);color:rgb(33,33,33)}
+.rail-btn .material-symbols-outlined{font-size:20px}
+.rail-badge{position:absolute;top:2px;right:2px;width:7px;height:7px;background:#ef4444;border-radius:50%;border:1.5px solid rgb(229,233,240)}
+
+/* ── SIDEBAR (L2) ── */
+.sidebar{width:222px;background:#fff;border-right:1px solid rgb(234,234,234);overflow-y:auto;flex-shrink:0;padding:0}
+.sidebar::-webkit-scrollbar{width:4px}
+.sidebar::-webkit-scrollbar-thumb{background:rgb(199,214,246);border-radius:4px}
+/* title inside sidebar */
+.sb-title{height:52px;background:#fafafa;display:flex;align-items:center;gap:8px;padding:15px 16px;font-size:18px;font-weight:400;color:rgba(33,33,33,1);font-family:'Roboto',sans-serif;letter-spacing:-0.02em;flex-shrink:0;border-bottom:1px solid rgb(234,234,234)}
+/* search */
+.sb-search-wrap{padding:0 24px;background:#fafafa}
+.sb-search{display:flex;align-items:center;gap:8px;background:#fafafa;border:1px solid rgb(229,233,240);border-radius:4px;padding:8px 0;margin-bottom:0}
+.sb-search svg{width:20px;height:20px;color:rgba(48,48,48,1);flex-shrink:0;margin-left:8px}
+.sb-search input{border:none;background:transparent;font-size:14px;font-family:'Roboto',sans-serif;color:rgba(33,33,33,1);outline:none;width:100%;padding-right:8px}
+.sb-search input::placeholder{color:rgba(143,143,143,1)}
+/* content body */
+.sb-body{background:#fafafa;padding:8px 16px;display:flex;flex-direction:column;gap:8px}
+.sb-section-lbl{font-size:12px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;color:rgba(143,143,143,1);padding:0 4px 0 8px;height:24px;display:flex;align-items:center}
+.sb-group-hdr{display:flex;align-items:center;justify-content:space-between;padding:4px 8px;height:28px;cursor:pointer;font-size:14px;font-weight:400;color:rgba(33,33,33,1);border-radius:4px}
+.sb-group-hdr:hover{background:rgba(0,0,0,0.04)}
+.sb-group-hdr svg{width:20px;height:20px;color:rgba(48,48,48,1);flex-shrink:0}
+.sb-group-hdr.open{color:rgba(33,33,33,1)}
+.sb-item{display:flex;align-items:center;justify-content:space-between;padding:4px 8px;height:28px;cursor:pointer;font-size:14px;font-weight:400;color:rgba(33,33,33,1);border-radius:4px}
+.sb-item:hover{background:rgba(0,0,0,0.04)}
+.sb-item.active{background:rgba(199,214,246,1);color:rgba(33,33,33,1);font-weight:400}
+.sb-item .badge{font-size:12px;color:rgba(143,143,143,1);background:transparent;border-radius:10px;padding:0 4px;font-weight:400}
+.sb-item.active .badge{color:rgba(85,85,85,1)}
+
+/* ── TOP NAV ── */
+.top-nav{height:52px;background:#fff;border-bottom:1px solid rgb(234,234,234);display:flex;align-items:center;justify-content:flex-end;padding:0 24px;gap:4px;flex-shrink:0}
+.top-nav-btn{width:28px;height:28px;border-radius:4px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:rgb(48,48,48)}
+.top-nav-btn:hover{background:rgba(0,0,0,0.06)}
+.top-nav-btn .material-symbols-outlined{font-size:20px}
+
+/* ── MAIN ── */
+.main{flex:1;overflow-y:auto;display:flex;flex-direction:column}
+.main::-webkit-scrollbar{width:6px}
+.main::-webkit-scrollbar-thumb{background:#d1d5db;border-radius:4px}
+.page-hdr{height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;background:#fff;border-bottom:1px solid #e5e7eb;flex-shrink:0}
+.page-hdr h1{font-size:18px;font-weight:400;color:rgb(33,33,33)}
+.page-hdr-right{display:flex;align-items:center;gap:8px}
+.page-hdr-right svg{width:20px;height:20px;color:rgb(48,48,48);cursor:pointer}
+.page-hdr-right svg:hover{color:rgb(33,33,33)}
+.page-hdr-avatar{width:28px;height:28px;border-radius:50%;background:rgb(99,102,241);display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:700;flex-shrink:0;cursor:pointer}
+.topnav-actions{display:flex;align-items:center;gap:6px;border:1px solid #d1d5db;border-radius:4px;padding:6px 12px;font-size:14px;font-weight:400;color:rgb(33,33,33);cursor:pointer;background:#fff;font-family:'Roboto',sans-serif}
+.topnav-actions:hover{background:rgb(242,244,247)}
+.topnav-actions svg{width:16px;height:16px;color:rgb(48,48,48)}
+
+/* ── TABS ── */
+.tabs{display:flex;align-items:center;padding:0 24px;border-bottom:1px solid #e5e7eb;margin-top:6px;gap:0;background:transparent}
+.tabs-list{display:flex;align-items:center;flex:1;overflow-x:auto;gap:8px}
+.tabs-list::-webkit-scrollbar{display:none}
+.tab{display:flex;flex-direction:column;justify-content:space-between;padding:0;height:37px;font-size:14px;font-weight:400;color:rgb(85,85,85);cursor:pointer;white-space:nowrap;flex-shrink:0}
+.tab-inner{padding:8px 8px;flex:1;display:flex;align-items:center}
+.tab-indicator{height:1px;background:transparent}
+.tab:hover .tab-inner{background:rgb(242,244,247);color:rgb(33,33,33)}
+.tab.active .tab-inner{color:rgb(33,33,33)}
+.tab.active .tab-indicator{background:rgb(25,118,210)}
+.tabs-gear{width:28px;height:28px;margin-left:8px;flex-shrink:0;border:1px solid #e5e7eb;border-radius:4px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:rgb(48,48,48);background:#fff;transition:background .15s,color .15s}
+.tabs-gear:hover{background:rgb(242,244,247)}
+.tabs-gear.active{background:rgb(199,214,246);color:rgb(33,33,33);border-color:rgb(199,214,246)}
+.tabs-gear svg{width:16px;height:16px}
+
+/* ── SETTINGS PANEL ── */
+.panel-backdrop{position:fixed;inset:0;background:rgba(0,0,0,0.18);z-index:199;display:none}
+.panel-backdrop.open{display:block}
+.tab-settings-panel{position:fixed;top:0;right:0;bottom:0;width:300px;background:#fff;border-left:1px solid #e5e7eb;box-shadow:-4px 0 24px rgba(0,0,0,0.08);transform:translateX(100%);transition:transform .25s cubic-bezier(.4,0,.2,1);z-index:200;display:flex;flex-direction:column}
+.tab-settings-panel.open{transform:translateX(0)}
+
+.tsp-header{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;border-bottom:1px solid #e5e7eb;flex-shrink:0}
+.tsp-title{font-size:13.5px;font-weight:700;color:#111}
+.tsp-close{width:26px;height:26px;border-radius:5px;border:none;background:transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#6b7280}
+.tsp-close:hover{background:#f3f4f6;color:#111}
+.tsp-close svg{width:15px;height:15px}
+
+/* ── ADD VIEW ── */
+.tsp-add-wrap{padding:12px 18px;flex-shrink:0;position:relative}
+.add-view-btn{display:flex;align-items:center;gap:6px;width:100%;padding:7px 12px;background:rgb(25,118,210);border:none;border-radius:6px;font-size:12.5px;font-weight:600;color:#fff;cursor:pointer;justify-content:center;transition:background .15s}
+.add-view-btn:hover{background:rgb(15,69,124)}
+.add-view-btn svg{width:14px;height:14px}
+
+/* ── ADD VIEW POPOVER (inline inside panel) ── */
+.av-popover{
+  position:absolute;top:calc(100% - 8px);left:18px;right:18px;
+  background:#fff;border:1px solid #e5e7eb;border-radius:8px;
+  box-shadow:0 4px 20px rgba(0,0,0,0.12);z-index:10;
+  display:none;flex-direction:column;max-height:320px;overflow:hidden;
+}
+.av-popover.open{display:flex}
+
+.av-tab-bar{display:flex;border-bottom:1px solid #e5e7eb;flex-shrink:0}
+.av-tab{flex:1;text-align:center;padding:9px 0;font-size:12px;font-weight:500;color:#6b7280;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:color .15s}
+.av-tab:hover{color:#111}
+.av-tab.active{color:rgb(25,118,210);border-bottom-color:rgb(25,118,210);font-weight:600}
+
+.av-search{padding:8px 10px;border-bottom:1px solid #f3f4f6;flex-shrink:0}
+.av-search input{width:100%;border:1px solid #e5e7eb;border-radius:5px;padding:5px 8px;font-size:12px;color:#374151;outline:none;background:#f9fafb}
+.av-search input:focus{border-color:rgb(25,118,210);background:#fff}
+
+.av-list{overflow-y:auto;padding:4px 0}
+.av-list::-webkit-scrollbar{width:3px}
+.av-list::-webkit-scrollbar-thumb{background:#e5e7eb;border-radius:3px}
+
+.av-item{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;cursor:pointer;font-size:12.5px;color:#374151;transition:background .1s}
+.av-item:hover:not(.av-item-added){background:#f3f4f6}
+.av-item-added{color:#9ca3af;cursor:default}
+.av-item-added .av-check{display:flex}
+.av-check{display:none;align-items:center;color:rgb(25,118,210)}
+.av-check svg{width:13px;height:13px}
+.av-empty{padding:16px 12px;text-align:center;font-size:12px;color:#9ca3af}
+
+/* ── PANEL LIST (only enabled items) ── */
+.tsp-list{flex:1;overflow-y:auto;padding:4px 0}
+.tsp-list::-webkit-scrollbar{width:4px}
+.tsp-list::-webkit-scrollbar-thumb{background:#e5e7eb;border-radius:4px}
+
+.tsp-row{display:flex;align-items:center;padding:8px 12px 8px 10px;transition:background .1s;user-select:none}
+.tsp-row:hover{background:#f9fafb}
+.tsp-row-name{font-size:12.5px;color:#374151;flex:1}
+.tsp-row-tag{font-size:10px;padding:1px 6px;border-radius:10px;font-weight:500;margin-left:6px;flex-shrink:0}
+.tsp-row-tag.metrics{background:#ede9fe;color:#7c3aed}
+.tsp-row-tag.group{background:#dcfce7;color:#16a34a}
+
+/* drag handle */
+.tsp-drag-handle{width:20px;height:20px;flex-shrink:0;margin-right:6px;display:flex;align-items:center;justify-content:center;color:#d1d5db;cursor:grab;border-radius:3px}
+.tsp-row:hover .tsp-drag-handle{color:#9ca3af}
+.tsp-drag-handle svg{width:12px;height:12px;pointer-events:none}
+
+/* remove button */
+.tsp-remove-btn{width:22px;height:22px;border-radius:4px;border:none;background:transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#d1d5db;flex-shrink:0;opacity:0;transition:opacity .15s,color .15s,background .15s}
+.tsp-row:hover .tsp-remove-btn{opacity:1}
+.tsp-remove-btn:hover{color:#ef4444;background:#fee2e2}
+.tsp-remove-btn svg{width:12px;height:12px;pointer-events:none}
+
+/* drag states */
+.tsp-row.dragging{opacity:.35;background:#f9fafb}
+.tsp-row.drag-over{background:#eff6ff;border-top:2px solid rgb(25,118,210)}
+
+/* footer */
+.tsp-footer{border-top:1px solid #e5e7eb;padding:12px 18px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.tsp-count{font-size:12px;color:#6b7280}
+.tsp-count strong{color:#111}
+.tsp-max-warn{font-size:11px;color:#dc2626;font-weight:500;display:none}
+.tsp-max-warn.show{display:block}
+
+/* ── CARD ── */
+.content-pad{padding:16px 24px 24px}
+.card{background:#fff;border:1px solid #e5e7eb;border-radius:10px;overflow:hidden}
+.card-top{display:flex;align-items:flex-start;justify-content:space-between;padding:16px 20px 12px}
+.card-title{font-size:13.5px;font-weight:700;color:#111}
+.date-range-pill{display:flex;align-items:center;border:1px solid #e5e7eb;border-radius:20px;font-size:11.5px;overflow:hidden}
+.drp-seg{display:flex;align-items:center;gap:5px;padding:5px 12px;cursor:pointer;color:#374151}
+.drp-seg:first-child{border-right:1px solid #e5e7eb}
+.drp-seg .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.drp-seg .dot.gray{background:#cbd5e1}
+.drp-seg .dot.blue{background:rgb(25,118,210)}
+.drp-badge{background:rgb(25,118,210);color:#fff;font-size:9px;font-weight:700;border-radius:50%;width:14px;height:14px;display:flex;align-items:center;justify-content:center}
+.vs-sep{padding:0 6px;color:#9ca3af;font-size:11px}
+.card-actions{display:flex;align-items:center;gap:6px;margin-left:10px}
+.card-icon-btn{width:28px;height:28px;border:1px solid #e5e7eb;border-radius:6px;display:flex;align-items:center;justify-content:center;cursor:pointer;background:#fff;color:#6b7280}
+.card-icon-btn:hover{background:#f9fafb}
+.card-icon-btn svg{width:14px;height:14px}
+.stats-row{display:flex;align-items:flex-end;gap:20px;padding:0 20px 12px}
+.stat{display:flex;flex-direction:column;gap:1px}
+.stat-main{display:flex;align-items:baseline;gap:6px}
+.stat-val{font-size:20px;font-weight:800;color:#111}
+.stat-delta{font-size:11px;font-weight:600;padding:1px 5px;border-radius:10px}
+.stat-delta.up{background:#dcfce7;color:#16a34a}
+.stat-delta.down{background:#fee2e2;color:#dc2626}
+.stat-lbl{font-size:11px;color:#9ca3af;margin-top:1px}
+.star{color:#f59e0b;font-size:14px}
+.chart-section{padding:0 20px}
+.chart-divider{height:1px;background:#f3f4f6;margin:0 20px}
+.legend-row{display:flex;align-items:center;gap:16px;padding:10px 20px 16px}
+.leg{display:flex;align-items:center;gap:5px;font-size:11.5px;color:#6b7280}
+.scroll-bar-wrap{padding:0 20px 14px}
+.scroll-bar-track{height:6px;background:#f3f4f6;border-radius:6px}
+.scroll-bar-thumb{height:6px;width:40%;background:#cbd5e1;border-radius:6px;margin-left:45%}
+</style>
+</head>
+<body>
+
+<div class="body-wrap">
+
+  <!-- RAIL (L1) — full height, logo at top -->
+  <div class="rail">
+    <!-- Logo -->
+    <a href="../index.html" class="rail-logo-area" style="text-decoration:none">
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path fill-rule="evenodd" clip-rule="evenodd" d="M17.6417 15.8029L17.6417 15.8027L17.6384 15.8014C17.5927 15.7816 17.5463 15.7632 17.4992 15.7463L12.7315 13.8611L12.7311 13.8618C12.6006 13.804 12.4564 13.7713 12.3044 13.7713C11.7231 13.7713 11.2518 14.2403 11.2518 14.8187C11.2518 15.0578 11.3332 15.2774 11.4688 15.4537L11.4681 15.4544L11.4764 15.4638C11.5005 15.4944 11.5259 15.524 11.5532 15.5517L14.9714 19.459L14.9715 19.4589C15.3977 19.9372 16.0196 20.2391 16.7125 20.2391C17.9972 20.2391 19.0387 19.2029 19.0387 17.9247C19.0387 16.9752 18.4638 16.1598 17.6417 15.8029M16.0713 7.92504C17.1523 7.58657 18.3171 8.14557 18.673 9.17345C19.0289 10.2013 18.4411 11.3088 17.36 11.6473C16.2791 11.9856 15.1142 11.4266 14.7583 10.3989C14.4025 9.37094 14.9903 8.26336 16.0713 7.92504M23.5537 9.17994C23.3965 8.95849 23.168 8.81665 22.9198 8.75419L22.9196 8.75053L21.9876 8.50627C21.9741 8.46262 21.9653 8.41842 21.9506 8.37481C20.9828 5.51383 17.8153 3.95809 14.8755 4.89999C13.3526 5.38783 12.1944 6.45242 11.5617 7.76098L9.87757 10.4368L5.88029 8.85972L5.87765 8.86265C5.62588 8.76042 5.33869 8.73796 5.05933 8.82742C4.44192 9.02534 4.10609 9.67275 4.30931 10.2738C4.33911 10.3616 4.38134 10.4416 4.42915 10.5168L4.4222 10.5248L8.59266 16.045C8.59643 16.05 8.59829 16.0555 8.60205 16.0603C8.60577 16.0655 8.61067 16.0695 8.61463 16.0746L11.5983 20.2565C12.9021 22.5847 15.7227 23.9859 18.4456 23.1135C21.3852 22.1718 22.984 19.089 22.0161 16.228C21.7148 15.3376 21.2002 14.5738 20.5458 13.9722C21.3708 13.1844 21.9306 12.1679 22.1398 11.0647L23.0412 10.8043L23.0406 10.7945C23.1205 10.7643 23.1987 10.7278 23.2723 10.6784C23.7751 10.3402 23.9012 9.66943 23.5537 9.17994" fill="#1976D2"/>
+      </svg>
+    </a>
+    <!-- Nav buttons -->
+    <div class="rail-nav">
+      <div class="rail-btn" title="Overview"><span class="material-symbols-outlined">home</span></div>
+      <div class="rail-btn" style="position:relative" title="Inbox"><span class="material-symbols-outlined">sms</span><div class="rail-badge"></div></div>
+      <div class="rail-btn" title="Listings"><span class="material-symbols-outlined">location_on</span></div>
+      <div class="rail-btn" title="Reviews"><span class="material-symbols-outlined">grade</span></div>
+      <div class="rail-btn" title="Referrals"><span class="material-symbols-outlined">card_giftcard</span></div>
+      <div class="rail-btn" title="Payments"><span class="material-symbols-outlined">monetization_on</span></div>
+      <div class="rail-btn" title="Appointments"><span class="material-symbols-outlined">calendar_month</span></div>
+      <div class="rail-btn" title="Social"><span class="material-symbols-outlined">workspaces</span></div>
+      <div class="rail-btn" title="Surveys"><span class="material-symbols-outlined">assignment_turned_in</span></div>
+      <div class="rail-btn" title="Ticketing"><span class="material-symbols-outlined">shapes</span></div>
+      <div class="rail-btn" title="Contacts"><span class="material-symbols-outlined">group</span></div>
+      <div class="rail-btn active" title="Reports"><span class="material-symbols-outlined">bar_chart</span></div>
+      <div class="rail-btn" title="Campaigns"><span class="material-symbols-outlined">campaign</span></div>
+      <div style="flex:1"></div>
+      <div class="rail-btn" title="Settings"><span class="material-symbols-outlined">settings</span></div>
+    </div>
+  </div>
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sb-title">Reports</div>
+    <div class="sb-search-wrap">
+      <div class="sb-search">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+        <input placeholder="Search"/>
+      </div>
+    </div>
+    <div class="sb-body">
+      <div>
+        <div class="sb-section-lbl">Dashboards</div>
+        <div class="sb-group-hdr open">Default <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="sb-group-hdr">Created by me <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="sb-group-hdr">Shared with me <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div>
+      </div>
+      <div>
+        <div class="sb-section-lbl">Reports</div>
+        <div class="sb-group-hdr open" style="color:rgb(25,118,210)">Reviews <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="rgb(25,118,210)" stroke-width="2"><polyline points="18 15 12 9 6 15"/></svg></div>
+        <div class="sb-item active">Reviews &amp; ratings <span class="badge">4</span></div>
+        <div class="sb-item">Relative location rank <span class="badge">4</span></div>
+        <div class="sb-item">Reviews distribution <span class="badge">4</span></div>
+        <div class="sb-item">Response time <span class="badge">4</span></div>
+        <div class="sb-item">Response time distribu... <span class="badge">4</span></div>
+        <div class="sb-item">Response rate distribut... <span class="badge">4</span></div>
+        <div class="sb-item">Review NPS <span class="badge">4</span></div>
+        <div class="sb-item">Review tags <span class="badge">4</span></div>
+        <div class="sb-item">Leaderboard <span class="badge">4</span></div>
+        <div class="sb-group-hdr">Inbox <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="sb-group-hdr">Listings <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="sb-group-hdr">Social <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="sb-group-hdr">Surveys <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="sb-group-hdr">Campaigns <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="sb-group-hdr">Workflows</div>
+        <div class="sb-group-hdr">Ticketing <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="sb-group-hdr">Contacts <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+    <!-- TOP NAV -->
+    <div class="top-nav">
+      <!-- Add -->
+      <div class="top-nav-btn" title="Add">
+        <svg width="20" height="20" viewBox="0 0 15.1666 15.1666" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M7.04167 8.12496V10.8333C7.04167 10.9868 7.09318 11.1154 7.19621 11.2192C7.29924 11.323 7.4269 11.375 7.57921 11.375C7.73151 11.375 7.86055 11.323 7.96631 11.2192C8.07208 11.1154 8.12496 10.9868 8.12496 10.8333V8.12496H10.8333C10.9868 8.12496 11.1154 8.07344 11.2192 7.97042C11.323 7.86739 11.375 7.73972 11.375 7.58742C11.375 7.43511 11.323 7.30608 11.2192 7.20031C11.1154 7.09455 10.9868 7.04167 10.8333 7.04167H8.12496V4.33331C8.12496 4.17984 8.07344 4.0512 7.97042 3.9474C7.86739 3.84358 7.73972 3.79167 7.58742 3.79167C7.43511 3.79167 7.30608 3.84358 7.20031 3.9474C7.09455 4.0512 7.04167 4.17984 7.04167 4.33331V7.04167H4.33331C4.17984 7.04167 4.0512 7.09318 3.9474 7.19621C3.84358 7.29924 3.79167 7.4269 3.79167 7.57921C3.79167 7.73151 3.84358 7.86055 3.9474 7.96631C4.0512 8.07208 4.17984 8.12496 4.33331 8.12496H7.04167ZM7.59046 15.1666C6.54724 15.1666 5.56474 14.9693 4.64296 14.5745C3.72117 14.1798 2.91435 13.6367 2.2225 12.9452C1.53064 12.2536 0.987257 11.4475 0.592354 10.5267C0.197452 9.60591 0 8.62207 0 7.57517C0 6.52825 0.197361 5.54737 0.592083 4.63254C0.986806 3.71769 1.52993 2.91435 2.22146 2.2225C2.913 1.53064 3.71916 0.987258 4.63994 0.592355C5.56072 0.197452 6.54456 0 7.59146 0C8.63838 0 9.61925 0.197362 10.5341 0.592084C11.4489 0.986807 12.2523 1.52993 12.9441 2.22146C13.636 2.913 14.1794 3.71754 14.5743 4.63506C14.9692 5.55259 15.1666 6.53296 15.1666 7.57617C15.1666 8.61939 14.9693 9.60189 14.5745 10.5237C14.1798 11.4455 13.6367 12.2523 12.9452 12.9441C12.2536 13.636 11.4491 14.1794 10.5316 14.5743C9.61404 14.9692 8.63367 15.1666 7.59046 15.1666Z" fill="#1976D2"/>
+        </svg>
+      </div>
+      <!-- Help -->
+      <div class="top-nav-btn" title="Help">
+        <svg width="20" height="20" viewBox="0 0 15.1666 15.1666" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M7.61348 12.2628C7.83909 12.2628 8.03042 12.1849 8.18748 12.0291C8.34452 11.8733 8.42304 11.6826 8.42304 11.457C8.42304 11.2314 8.34515 11.04 8.18937 10.883C8.03358 10.7259 7.84288 10.6474 7.61727 10.6474C7.39165 10.6474 7.20031 10.7253 7.04327 10.8811C6.88622 11.0369 6.80769 11.2276 6.80769 11.4532C6.80769 11.6788 6.88558 11.8702 7.04138 12.0272C7.19715 12.1843 7.38785 12.2628 7.61348 12.2628ZM7.59046 15.1666C6.54724 15.1666 5.56474 14.9693 4.64296 14.5745C3.72117 14.1798 2.91435 13.6367 2.2225 12.9452C1.53064 12.2536 0.987257 11.4475 0.592354 10.5267C0.197452 9.60591 0 8.62207 0 7.57517C0 6.52825 0.197361 5.54737 0.592083 4.63254C0.986806 3.71769 1.52993 2.91435 2.22146 2.2225C2.913 1.53064 3.71916 0.987258 4.63994 0.592355C5.56072 0.197452 6.54456 0 7.59146 0C8.63838 0 9.61925 0.197362 10.5341 0.592084C11.4489 0.986807 12.2523 1.52993 12.9441 2.22146C13.636 2.913 14.1794 3.71754 14.5743 4.63506C14.9692 5.55259 15.1666 6.53296 15.1666 7.57617C15.1666 8.61939 14.9693 9.60189 14.5745 10.5237C14.1798 11.4455 13.6367 12.2523 12.9452 12.9441C12.2536 13.636 11.4491 14.1794 10.5316 14.5743C9.61404 14.9692 8.63367 15.1666 7.59046 15.1666ZM7.58331 14.0833C9.38887 14.0833 10.9236 13.4514 12.1875 12.1875C13.4514 10.9236 14.0833 9.38887 14.0833 7.58331C14.0833 5.77776 13.4514 4.24304 12.1875 2.97915C10.9236 1.71526 9.38887 1.08331 7.58331 1.08331C5.77776 1.08331 4.24303 1.71526 2.97915 2.97915C1.71526 4.24304 1.08331 5.77776 1.08331 7.58331C1.08331 9.38887 1.71526 10.9236 2.97915 12.1875C4.24303 13.4514 5.77776 14.0833 7.58331 14.0833ZM7.63467 4.016C8.0235 4.016 8.36001 4.13846 8.64421 4.38338C8.9284 4.62829 9.0705 4.93444 9.0705 5.30181C9.0705 5.61128 8.98423 5.88674 8.81169 6.12819C8.63915 6.36965 8.43749 6.5876 8.20673 6.78204C7.90423 7.05039 7.63442 7.35252 7.39731 7.68844C7.16021 8.02434 7.0406 8.39689 7.03846 8.80608C7.03311 8.95778 7.08361 9.07797 7.18996 9.16665C7.29631 9.25531 7.42037 9.29965 7.56217 9.29965C7.71408 9.29965 7.84213 9.25665 7.94629 9.17065C8.05044 9.08465 8.11801 8.97113 8.149 8.8301C8.21844 8.5299 8.34372 8.26549 8.52481 8.0369C8.7059 7.8083 8.90207 7.59091 9.11333 7.38473C9.41703 7.0887 9.66823 6.75898 9.86694 6.39556C10.0657 6.03213 10.165 5.64226 10.165 5.22596C10.165 4.56571 9.91876 4.0163 9.42625 3.57773C8.93374 3.13916 8.34436 2.91988 7.65812 2.91988C7.16808 2.91988 6.71046 3.03313 6.28525 3.25963C5.86004 3.48611 5.5101 3.80474 5.23544 4.2155C5.14792 4.34106 5.12469 4.47874 5.16573 4.62854C5.20677 4.77833 5.30092 4.88333 5.44817 4.94352C5.60024 5.01428 5.74945 5.02456 5.89581 4.97433C6.04217 4.92413 6.1645 4.84668 6.26279 4.74198C6.4316 4.53684 6.63245 4.36456 6.86535 4.22515C7.09826 4.08572 7.35469 4.016 7.63467 4.016Z" fill="#303030"/>
+        </svg>
+      </div>
+      <!-- Avatar -->
+      <div class="top-nav-btn" title="Account">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="10" cy="10" r="9.5" fill="white" stroke="#F4F6F7"/>
+          <circle cx="10" cy="10" r="8.75" fill="#D8D8D8"/>
+          <circle cx="10" cy="8.5" r="3" fill="#888"/>
+          <ellipse cx="10" cy="15.5" rx="4.5" ry="3" fill="#888"/>
+        </svg>
+      </div>
+      <!-- Menu -->
+      <div class="top-nav-btn" title="Menu">
+        <svg width="20" height="14" viewBox="0 0 13.1666 8.391" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M0.541667 8.391C0.388194 8.391 0.259548 8.33948 0.155729 8.23644C0.0519095 8.13341 0 8.00574 0 7.85344C0 7.70113 0.0519095 7.5721 0.155729 7.46633C0.259548 7.36057 0.388194 7.30769 0.541667 7.30769H12.625C12.7784 7.30769 12.9071 7.3592 13.0109 7.46223C13.1147 7.56526 13.1666 7.69292 13.1666 7.84523C13.1666 7.99753 13.1147 8.12657 13.0109 8.23233C12.9071 8.33811 12.7784 8.391 12.625 8.391H0.541667ZM0.541667 4.73715C0.388194 4.73715 0.259548 4.68563 0.155729 4.5826C0.0519095 4.47958 0 4.35191 0 4.1996C0 4.0473 0.0519095 3.91826 0.155729 3.8125C0.259548 3.70674 0.388194 3.65385 0.541667 3.65385H12.625C12.7784 3.65385 12.9071 3.70537 13.0109 3.8084C13.1147 3.91142 13.1666 4.03909 13.1666 4.1914C13.1666 4.3437 13.1147 4.47274 13.0109 4.5785C12.9071 4.68426 12.7784 4.73715 12.625 4.73715H0.541667ZM0.541667 1.08331C0.388194 1.08331 0.259548 1.0318 0.155729 0.928771C0.0519095 0.825743 0 0.698076 0 0.54577C0 0.393464 0.0519095 0.26443 0.155729 0.158666C0.259548 0.0528882 0.388194 0 0.541667 0H12.625C12.7784 0 12.9071 0.0515197 13.0109 0.154561C13.1147 0.257589 13.1666 0.385257 13.1666 0.537562C13.1666 0.689868 13.1147 0.818902 13.0109 0.924666C12.9071 1.03043 12.7784 1.08331 12.625 1.08331H0.541667Z" fill="#303030"/>
+        </svg>
+      </div>
+    </div>
+    <div class="page-hdr">
+      <h1>Reviews &amp; ratings over time</h1>
+      <div class="page-hdr-right">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+        <button class="topnav-actions">Actions <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></button>
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="21" y1="10" x2="3" y2="10"/><line x1="21" y1="6" x2="3" y2="6"/><line x1="21" y1="14" x2="3" y2="14"/><line x1="21" y1="18" x2="3" y2="18"/></svg>
+      </div>
+    </div>
+
+    <div class="tabs" id="tabs-bar">
+      <div class="tabs-list" id="tabs-list"></div>
+      <button class="tabs-gear" id="tabs-gear-btn" title="Manage tabs">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+      </button>
+    </div>
+
+    <div class="content-pad">
+      <div class="card">
+        <div class="card-top">
+          <div class="card-title">Reviews &amp; ratings over time</div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <div class="date-range-pill">
+              <div class="drp-seg"><div class="dot gray"></div><span>Sep 30 - Nov 31, 2023</span></div>
+              <div class="vs-sep">vs</div>
+              <div class="drp-seg"><div class="dot blue"></div><span>Dec 1, 2023 - Jan 31, 2024</span><div class="drp-badge">2</div></div>
+            </div>
+            <div class="card-actions">
+              <div class="card-icon-btn"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="20" y2="12"/><line x1="12" y1="18" x2="20" y2="18"/></svg></div>
+              <div class="card-icon-btn"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="1" fill="currentColor"/><circle cx="12" cy="12" r="1" fill="currentColor"/><circle cx="12" cy="19" r="1" fill="currentColor"/></svg></div>
+            </div>
+          </div>
+        </div>
+        <div class="stats-row">
+          <div class="stat"><div class="stat-main"><span class="stat-val">11.3k</span><span class="stat-delta up">+1.3%</span></div><div class="stat-lbl">Reviews</div></div>
+          <div class="stat"><div class="stat-main"><span class="stat-val">4.4</span><span class="star">★</span><span class="stat-delta down">-1.3%</span></div><div class="stat-lbl">Rating</div></div>
+        </div>
+        <div class="chart-section" style="height:140px"><canvas id="lineChart"></canvas></div>
+        <div class="chart-divider"></div>
+        <div class="chart-section" style="height:200px;margin-top:4px"><canvas id="barChart"></canvas></div>
+        <div class="legend-row">
+          <div class="leg"><div style="border-top:2px dashed #94a3b8;width:20px;height:0"></div> Legend 1</div>
+          <div class="leg"><div style="border-top:2px solid #1e3a5f;width:20px;height:0"></div> Legend 1</div>
+        </div>
+        <div class="scroll-bar-wrap"><div class="scroll-bar-track"><div class="scroll-bar-thumb"></div></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SETTINGS PANEL -->
+<div class="panel-backdrop" id="panel-backdrop"></div>
+<div class="tab-settings-panel" id="tab-settings-panel">
+
+  <div class="tsp-header">
+    <span class="tsp-title">Manage tabs</span>
+    <button class="tsp-close" id="tsp-close-btn">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+
+  <!-- Add tab button + popover -->
+  <div class="tsp-add-wrap" id="tsp-add-wrap">
+    <button class="add-view-btn" id="add-view-btn">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Add tab
+    </button>
+    <div class="av-popover" id="av-popover">
+      <div class="av-tab-bar">
+        <div class="av-tab active" data-cat="metrics">Metrics</div>
+        <div class="av-tab" data-cat="groups">Groups</div>
+      </div>
+      <div class="av-search">
+        <input id="av-search-input" placeholder="Search…" autocomplete="off"/>
+      </div>
+      <div class="av-list" id="av-list"></div>
+    </div>
+  </div>
+
+  <div class="tsp-list" id="tsp-list"></div>
+
+  <div class="tsp-footer">
+    <span class="tsp-count"><strong id="tsp-count-num">3</strong> / 7 tabs active</span>
+    <span class="tsp-max-warn" id="tsp-max-warn">Max 7 tabs reached</span>
+  </div>
+</div>
+
+<script>
+// ─── DATA ───
+const MAX_VIEWS = 7;
+
+const AVAILABLE = {
+  metrics: [
+    'Over time', 'By rating', 'By sentiment', 'By source',
+    'Response time', 'Response rate', 'Review NPS', 'Review count',
+    'Avg rating', 'Review volume', 'Sentiment score', 'NPS score',
+  ],
+  groups: [
+    'North region', 'Southern regions', 'Reputation mgmt team', 'Jennifer Hall',
+    'By employee', 'By location', 'By custom test', 'By new alpha beta test',
+    'By room custom', 'By region manager', 'By area code', 'By department',
+  ],
+};
+
+// panelItems = currently active tabs shown in panel + tab bar
+// { name, category: 'metrics'|'groups' }
+let panelItems = [
+  { name: 'Over time',      category: 'metrics' },
+  { name: 'By rating',      category: 'metrics' },
+  { name: 'By sentiment',   category: 'metrics' },
+];
+
+let activeTab = 'Over time';
+let dragSrcIndex = null;
+let dragOverIndex = null;
+let avActiveCat = 'metrics';
+
+// ─── TAB BAR ───
+function renderTabs() {
+  const list = document.getElementById('tabs-list');
+  list.innerHTML = '';
+  panelItems.forEach(t => {
+    const el = document.createElement('div');
+    el.className = 'tab' + (t.name === activeTab ? ' active' : '');
+    el.innerHTML = `<div class="tab-inner">${t.name}</div><div class="tab-indicator"></div>`;
+    el.addEventListener('click', () => { activeTab = t.name; renderTabs(); });
+    list.appendChild(el);
+  });
+}
+
+// ─── PANEL LIST (only active items) ───
+function clearDragStyles() {
+  document.querySelectorAll('.tsp-row').forEach(r => r.classList.remove('drag-over','dragging'));
+}
+
+function renderPanel() {
+  const list = document.getElementById('tsp-list');
+  list.innerHTML = '';
+
+  panelItems.forEach((t, i) => {
+    const row = document.createElement('div');
+    row.className = 'tsp-row';
+    row.setAttribute('draggable', 'true');
+    row.dataset.index = i;
+
+    // drag handle
+    const handle = document.createElement('div');
+    handle.className = 'tsp-drag-handle';
+    handle.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 16" fill="currentColor">
+      <circle cx="4" cy="2" r="1.2"/><circle cx="8" cy="2" r="1.2"/>
+      <circle cx="4" cy="6" r="1.2"/><circle cx="8" cy="6" r="1.2"/>
+      <circle cx="4" cy="10" r="1.2"/><circle cx="8" cy="10" r="1.2"/>
+      <circle cx="4" cy="14" r="1.2"/><circle cx="8" cy="14" r="1.2"/>
+    </svg>`;
+
+    // name
+    const nameEl = document.createElement('span');
+    nameEl.className = 'tsp-row-name';
+    nameEl.textContent = t.name;
+
+    // category tag
+    const tag = document.createElement('span');
+    tag.className = 'tsp-row-tag ' + t.category;
+    tag.textContent = t.category === 'metrics' ? 'Metric' : 'Group';
+
+    // remove button
+    const removeBtn = document.createElement('button');
+    removeBtn.className = 'tsp-remove-btn';
+    removeBtn.title = 'Remove';
+    removeBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`;
+    removeBtn.addEventListener('click', e => {
+      e.stopPropagation();
+      panelItems.splice(i, 1);
+      if (activeTab === t.name) {
+        activeTab = panelItems[0]?.name || '';
+      }
+      updateFooter();
+      renderPanel();
+      renderTabs();
+      renderAvList();
+    });
+
+    // drag events
+    row.addEventListener('dragstart', e => {
+      dragSrcIndex = i;
+      e.dataTransfer.effectAllowed = 'move';
+      e.dataTransfer.setData('text/plain', String(i));
+      requestAnimationFrame(() => row.classList.add('dragging'));
+    });
+    row.addEventListener('dragenter', e => {
+      e.preventDefault();
+      if (dragSrcIndex === null || dragSrcIndex === i) return;
+      dragOverIndex = i;
+      clearDragStyles();
+      row.classList.add('drag-over');
+      document.querySelector(`[data-index="${dragSrcIndex}"]`)?.classList.add('dragging');
+    });
+    row.addEventListener('dragover', e => { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; });
+    row.addEventListener('dragleave', e => { if (!row.contains(e.relatedTarget)) row.classList.remove('drag-over'); });
+    row.addEventListener('drop', e => {
+      e.preventDefault();
+      if (dragSrcIndex === null || dragSrcIndex === dragOverIndex) return;
+      const moved = panelItems.splice(dragSrcIndex, 1)[0];
+      panelItems.splice(dragOverIndex, 0, moved);
+      dragSrcIndex = null; dragOverIndex = null;
+      renderPanel(); renderTabs();
+    });
+    row.addEventListener('dragend', () => { dragSrcIndex = null; dragOverIndex = null; clearDragStyles(); });
+
+    row.appendChild(handle);
+    row.appendChild(nameEl);
+    row.appendChild(tag);
+    row.appendChild(removeBtn);
+    list.appendChild(row);
+  });
+}
+
+// ─── ADD VIEW POPOVER ───
+function isAdded(name) { return panelItems.some(p => p.name === name); }
+
+function renderAvList() {
+  const list = document.getElementById('av-list');
+  const query = document.getElementById('av-search-input').value.trim().toLowerCase();
+  const items = AVAILABLE[avActiveCat].filter(n => n.toLowerCase().includes(query));
+  list.innerHTML = '';
+
+  if (items.length === 0) {
+    list.innerHTML = '<div class="av-empty">No results</div>';
+    return;
+  }
+
+  items.forEach(name => {
+    const added = isAdded(name);
+    const row = document.createElement('div');
+    row.className = 'av-item' + (added ? ' av-item-added' : '');
+    row.innerHTML = `
+      <span>${name}</span>
+      <span class="av-check">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+      </span>`;
+
+    if (!added) {
+      row.addEventListener('click', () => {
+        if (panelItems.length >= MAX_VIEWS) { showMaxWarn(); return; }
+        panelItems.push({ name, category: avActiveCat });
+        updateFooter();
+        renderPanel();
+        renderTabs();
+        renderAvList(); // refresh checkmarks
+      });
+    }
+    list.appendChild(row);
+  });
+}
+
+function openAvPopover() {
+  document.getElementById('av-popover').classList.add('open');
+  document.getElementById('add-view-btn').style.background = 'rgb(15,69,124)';
+  renderAvList();
+}
+function closeAvPopover() {
+  document.getElementById('av-popover').classList.remove('open');
+  document.getElementById('add-view-btn').style.background = '';
+  document.getElementById('av-search-input').value = '';
+}
+
+// tab switching inside popover
+document.querySelectorAll('.av-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.av-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    avActiveCat = tab.dataset.cat;
+    document.getElementById('av-search-input').value = '';
+    renderAvList();
+  });
+});
+
+document.getElementById('add-view-btn').addEventListener('click', e => {
+  e.stopPropagation();
+  const popover = document.getElementById('av-popover');
+  if (popover.classList.contains('open')) closeAvPopover();
+  else openAvPopover();
+});
+
+document.getElementById('av-search-input').addEventListener('input', renderAvList);
+
+// close popover on outside click
+document.addEventListener('click', e => {
+  const wrap = document.getElementById('tsp-add-wrap');
+  if (!wrap.contains(e.target)) closeAvPopover();
+});
+
+// ─── FOOTER ───
+function updateFooter() {
+  document.getElementById('tsp-count-num').textContent = panelItems.length;
+  if (panelItems.length < MAX_VIEWS) hideMaxWarn();
+}
+
+let warnTimer;
+function showMaxWarn() {
+  const w = document.getElementById('tsp-max-warn');
+  w.classList.add('show');
+  clearTimeout(warnTimer);
+  warnTimer = setTimeout(() => w.classList.remove('show'), 2000);
+}
+function hideMaxWarn() { document.getElementById('tsp-max-warn').classList.remove('show'); }
+
+// ─── PANEL OPEN / CLOSE ───
+function openPanel() {
+  renderPanel();
+  updateFooter();
+  document.getElementById('tab-settings-panel').classList.add('open');
+  document.getElementById('panel-backdrop').classList.add('open');
+  document.getElementById('tabs-gear-btn').classList.add('active');
+}
+function closePanel() {
+  closeAvPopover();
+  document.getElementById('tab-settings-panel').classList.remove('open');
+  document.getElementById('panel-backdrop').classList.remove('open');
+  document.getElementById('tabs-gear-btn').classList.remove('active');
+}
+
+document.getElementById('tabs-gear-btn').addEventListener('click', openPanel);
+document.getElementById('tsp-close-btn').addEventListener('click', closePanel);
+document.getElementById('panel-backdrop').addEventListener('click', closePanel);
+document.addEventListener('keydown', e => { if (e.key === 'Escape') { if (document.getElementById('av-popover').classList.contains('open')) closeAvPopover(); else closePanel(); } });
+
+// init
+renderTabs();
+updateFooter();
+
+// ─── CHARTS ───
+const labels = ['1','2','3','4','5','6','7','8','9','10','11','12'];
+const ratingPrev = [4.45,4.50,4.42,4.48,4.38,4.44,4.50,4.45,4.40,4.46,4.43,4.41];
+const ratingCurr = [4.32,4.28,4.35,4.30,4.40,4.36,4.29,4.33,4.38,4.31,4.37,4.25];
+const reviewsPrev = [434,434,434,434,434,434,434,434,434,434,434,434];
+const reviewsCurr = [494,234,234,234,234,234,234,234,234,234,234,234];
+
+new Chart(document.getElementById('lineChart').getContext('2d'), {
+  type:'line', data:{labels, datasets:[
+    {label:'Sep 30',data:ratingPrev,borderColor:'#94a3b8',borderWidth:1.5,borderDash:[5,4],pointBackgroundColor:'#94a3b8',pointRadius:3,tension:0.35,fill:false},
+    {label:'Dec 1',data:ratingCurr,borderColor:'#1e3a5f',borderWidth:2,pointBackgroundColor:'#1e3a5f',pointRadius:3.5,tension:0.35,fill:false}
+  ]},
+  options:{responsive:true,maintainAspectRatio:false,animation:false,plugins:{legend:{display:false},tooltip:{mode:'index'}},
+    scales:{x:{grid:{display:false},ticks:{display:false},border:{display:false}},y:{min:0,max:5,ticks:{stepSize:1,font:{size:10},color:'#9ca3af',padding:4},grid:{color:'#f3f4f6'},border:{display:false}}}}
+});
+
+new Chart(document.getElementById('barChart').getContext('2d'), {
+  type:'bar', data:{labels, datasets:[
+    {label:'Sep 30',data:reviewsPrev,backgroundColor:'#93c5fd',borderRadius:3,barPercentage:0.85,categoryPercentage:0.75},
+    {label:'Dec 1',data:reviewsCurr,backgroundColor:'rgb(15,69,124)',borderRadius:3,barPercentage:0.85,categoryPercentage:0.75}
+  ]},
+  options:{responsive:true,maintainAspectRatio:false,animation:false,plugins:{legend:{display:false},tooltip:{mode:'index'}},
+    scales:{x:{grid:{display:false},ticks:{font:{size:10},color:'#6b7280',padding:4},border:{display:false}},y:{min:0,max:550,ticks:{stepSize:100,font:{size:10},color:'#9ca3af',padding:4},grid:{color:'#f3f4f6'},border:{display:false}}}},
+  plugins:[{id:'barLabels',afterDatasetsDraw(chart){const{ctx}=chart;chart.data.datasets.forEach((ds,di)=>{chart.getDatasetMeta(di).data.forEach((bar,i)=>{ctx.save();ctx.fillStyle='#374151';ctx.font='9px sans-serif';ctx.textAlign='center';ctx.textBaseline='bottom';ctx.fillText(ds.data[i],bar.x,bar.y-2);ctx.restore();});});}}]
+});
+</script>
+</body>
+</html>
