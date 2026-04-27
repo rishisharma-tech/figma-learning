@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <title>Listings — Reviews — New Filter</title>
-<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet"/>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:'Roboto',sans-serif;background:#f1f3f4;height:100vh;overflow:hidden;display:flex;}
@@ -80,59 +80,148 @@ body{font-family:'Roboto',sans-serif;background:#f1f3f4;height:100vh;overflow:hi
 .featured-badge{background:#f1f3f4;border:1px solid #e0e0e0;border-radius:20px;padding:2px 10px;font-size:11px;color:#555;margin-left:8px;}
 
 /* ════════════════════════════════════
-   NEW FILTER PANEL from RisFilters.html
+   FILTER PANEL — Aero DS floating labels (Poppins)
    ════════════════════════════════════ */
-.filter-panel{width:272px;background:#fff;border-left:1px solid #e0e0e0;flex-shrink:0;display:flex;flex-direction:column;overflow-y:auto;}
+.filter-panel{
+  width:272px;background:#fff;border-left:1px solid #e0e0e0;flex-shrink:0;
+  display:flex;flex-direction:column;overflow-y:auto;
+  font-family:'Poppins',sans-serif;
+}
 
-/* .fp-head */
 .fp-head{display:flex;align-items:center;justify-content:space-between;padding:16px 20px 10px;border-bottom:1px solid #eaeaea;flex-shrink:0;}
-.fp-title{font-size:16px;font-weight:700;color:#212121;letter-spacing:-0.32px;}
-.fp-head-right{display:flex;align-items:center;gap:6px;}
-.fp-clear{font-size:14px;color:#1976d2;cursor:pointer;}
-.fp-cbadge{background:#1976d2;color:#fff;font-size:11px;font-weight:500;min-width:18px;height:18px;border-radius:9px;display:inline-flex;align-items:center;justify-content:center;padding:0 4px;}
+.fp-title{font-size:16px;font-weight:700;color:#212121;letter-spacing:-0.32px;font-family:'Roboto',sans-serif;}
+.fp-head-right{display:flex;align-items:center;gap:8px;}
+.fp-clear{font-size:14px;font-weight:400;color:#1976d2;cursor:pointer;user-select:none;}
+.fp-clear:hover{text-decoration:underline;}
+.fp-cbadge{
+  background:#1976d2;color:#fff;font-size:11px;font-weight:500;
+  min-width:18px;height:18px;border-radius:9px;
+  display:none;align-items:center;justify-content:center;padding:0 5px;
+}
+.fp-cbadge.is-visible{display:inline-flex;}
 
-/* .fp-search */
-.fp-search{display:flex;align-items:center;gap:8px;border:1px solid #dadce0;border-radius:8px;padding:0 12px;height:38px;margin:10px 20px 8px;flex-shrink:0;}
+/* unchanged per spec */
+.fp-search{display:flex;align-items:center;gap:8px;border:1px solid #dadce0;border-radius:8px;padding:0 12px;height:38px;margin:10px 20px 8px;flex-shrink:0;font-family:'Roboto',sans-serif;}
 .fp-search svg{width:14px;height:14px;stroke:#8f8f8f;fill:none;stroke-width:2;stroke-linecap:round;flex-shrink:0;}
 .fp-search span{font-size:14px;color:#9aa0a6;}
 
-/* .fp-list */
-.fp-list{display:flex;flex-direction:column;gap:8px;padding:8px 20px 16px;}
+.fp-list{display:flex;flex-direction:column;gap:10px;padding:8px 20px 16px;}
 
-/* .fr base */
-.fr{border-radius:8px;border:1px solid #dadce0;background:#fff;overflow:hidden;}
-.fr-hd{display:flex;align-items:center;gap:8px;padding:8px 12px;min-height:44px;}
-.fr-lbl{font-size:14px;color:#80868b;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.fr-chv svg{width:18px;height:18px;stroke:#5f6368;fill:none;stroke-width:2;stroke-linecap:round;display:block;}
+/* —— Floating filter field —— */
+.ff{position:relative;}
+.ff-field{
+  position:relative;
+  min-height:44px;
+  border:1px solid #e5e5e5;border-radius:8px;background:#fff;
+  display:flex;align-items:stretch;
+  cursor:pointer;transition:border-color .15s ease;
+  padding:0 36px 0 12px;
+}
+.ff:not(.ff-filled):not(.ff-open) .ff-field{height:44px;}
+.ff.ff-filled .ff-field,.ff.ff-open .ff-field{height:auto;min-height:44px;padding-top:8px;padding-bottom:8px;}
+.ff-field:hover{border-color:#d0d0d0;}
+.ff.ff-open .ff-field{border-color:#1976d2;}
+.ff.ff-filled .ff-field{border-color:#e5e5e5;}
+.ff.ff-filled.ff-open .ff-field{border-color:#1976d2;}
 
-/* .fr.chip */
-.fr.chip .fr-hd{padding:6px 12px;min-height:44px;}
-.fr-body-col{display:flex;flex-direction:column;flex:1;min-width:0;justify-content:center;}
-.fr-float-label{font-size:10px;color:#9aa0a6;font-weight:400;margin-bottom:2px;letter-spacing:0;}
-.fr.chip .fr-lbl{color:#212121;font-size:14px;}
-.chip-x{width:20px;height:20px;flex-shrink:0;display:flex;align-items:center;justify-content:center;}
-.chip-x svg{width:11px;height:11px;stroke:#8f8f8f;fill:none;stroke-width:2;stroke-linecap:round;}
+.ff-inner{
+  flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center;
+  position:relative;padding:0;
+}
+/* Resting label (inside field, empty + closed) */
+.ff-rest{
+  font-size:14px;font-weight:400;color:#8f8f8f;line-height:1.2;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  pointer-events:none;
+}
+.ff.ff-open .ff-rest,.ff.ff-filled .ff-rest{display:none;}
+/* Floating label (open or filled) */
+.ff-float{
+  display:none;
+  font-size:10px;font-weight:500;color:#1976d2;line-height:1.2;
+  margin-bottom:2px;padding:0;
+}
+.ff.ff-open .ff-float,.ff.ff-filled .ff-float{display:block;}
+.ff:not(.ff-filled):not(.ff-open) .ff-float{display:none!important;}
+/* When open but not filled, still show float */
+.ff.ff-open:not(.ff-filled) .ff-float{display:block;}
+.ff.ff-open:not(.ff-filled) .ff-inner{justify-content:flex-start;min-height:0;}
 
-/* .fr.open */
-.fr.open{border-color:#1976d2;border-width:2px;}
-.fr.open .fr-hd{padding:6px 11px;min-height:44px;}
-.fr.open .fr-lbl{font-size:12px;color:#1976d2;font-weight:500;}
-.fr.open .fr-chv svg{stroke:#1976d2;transform:rotate(180deg);}
-.fr-body{border-top:1px solid #eaeaea;}
-.fr-dd-search{display:flex;align-items:center;gap:6px;margin:7px 9px;border:1px solid #e5e9f0;border-radius:6px;padding:0 9px;height:32px;}
-.fr-dd-search svg{width:12px;height:12px;stroke:#9aa0a6;fill:none;stroke-width:2;stroke-linecap:round;}
-.fr-dd-search span{font-size:12px;color:#9aa0a6;}
-.cb-list{display:flex;flex-direction:column;}
-.cb-row{display:flex;align-items:center;gap:9px;padding:6px 13px;}
-.cb{width:15px;height:15px;border-radius:3px;border:2px solid #e5e9f0;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:#fff;}
+.ff:not(.ff-filled):not(.ff-open) .ff-inner{
+  justify-content:center;min-height:100%;
+}
+
+.ff-value{
+  display:none;
+  font-size:14px;font-weight:400;color:#212121;line-height:1.25;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.ff.ff-filled .ff-value{display:block;}
+
+.ff-chv{
+  position:absolute;right:10px;top:50%;transform:translateY(-50%);
+  width:20px;height:20px;display:flex;align-items:center;justify-content:center;
+  pointer-events:none;color:#8f8f8f;
+}
+.ff-chv svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;display:block;}
+.ff.ff-open .ff-chv{transform:translateY(-50%) rotate(180deg);color:#1976d2;}
+
+.ff-clear{
+  position:absolute;right:32px;top:50%;transform:translateY(-50%);
+  width:28px;height:28px;border:none;background:transparent;cursor:pointer;
+  display:none;align-items:center;justify-content:center;padding:0;color:#8f8f8f;border-radius:4px;
+}
+.ff-clear:hover{background:#f5f5f5;color:#212121;}
+.ff-clear svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;}
+.ff.ff-filled .ff-clear{display:flex;}
+.ff.ff-filled.ff-open .ff-clear{right:32px;}
+
+/* Dropdown */
+.ff-drop{
+  display:none;margin-top:4px;border:1px solid #e5e5e5;border-radius:8px;background:#fff;
+  box-shadow:0 4px 12px rgba(0,0,0,.08);overflow:hidden;z-index:4;
+}
+.ff.ff-open .ff-drop{display:block;}
+
+.ff-loc-search-wrap{
+  display:none;padding:8px 10px 0;border-bottom:1px solid #f0f0f0;
+}
+.ff[data-has-loc-search="1"] .ff-loc-search-wrap{display:block;}
+.ff-loc-search{
+  display:flex;align-items:center;gap:8px;border:1px solid #e5e5e5;border-radius:8px;
+  padding:0 10px;height:36px;margin-bottom:8px;
+}
+.ff-loc-search svg{width:14px;height:14px;stroke:#8f8f8f;flex-shrink:0;}
+.ff-loc-search input{
+  border:none;outline:none;flex:1;font-family:'Poppins',sans-serif;font-size:13px;color:#212121;background:transparent;
+}
+.ff-loc-search input::placeholder{color:#8f8f8f;}
+
+.cb-list{max-height:200px;overflow-y:auto;padding:4px 0;}
+.cb-row{
+  display:flex;align-items:center;gap:10px;padding:8px 12px;cursor:pointer;
+}
+.cb-row:hover{background:#f8f9fa;}
+.cb-row.is-checked{background:#ecf5fd;}
+.cb{
+  width:18px;height:18px;border-radius:3px;border:1px solid #e5e5e5;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;background:#fff;
+}
 .cb.on{background:#1976d2;border-color:#1976d2;}
-.cb svg{display:none;width:9px;height:9px;stroke:#fff;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;}
+.cb svg{display:none;width:10px;height:10px;stroke:#fff;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;}
 .cb.on svg{display:block;}
-.cb-lbl{font-size:14px;color:#1a1a1a;}
-.fr-foot{display:flex;justify-content:flex-end;padding:8px 12px;border-top:1px solid #eaeaea;}
-.apply-btn{background:#1976d2;color:#fff;font-family:'Roboto',sans-serif;font-size:13px;font-weight:500;padding:6px 18px;border:none;border-radius:4px;cursor:pointer;}
+.cb-lbl{font-size:14px;color:#212121;flex:1;}
+.cb-row.is-checked .cb-lbl{color:#1976d2;font-weight:500;}
 
-.fp-see-all{font-size:14px;color:#1976d2;cursor:pointer;padding:4px 20px 12px;display:block;}
+.ff-foot{display:flex;justify-content:flex-end;padding:8px 12px;border-top:1px solid #eaeaea;background:#fafafa;}
+.apply-btn{
+  background:#1976d2;color:#fff;font-family:'Poppins',sans-serif;font-size:13px;font-weight:500;
+  padding:8px 20px;border:none;border-radius:4px;cursor:pointer;
+}
+.apply-btn:hover{filter:brightness(1.05);}
+.apply-btn:active{filter:brightness(.95);}
+
+.fp-see-all{font-size:14px;color:#1976d2;cursor:pointer;padding:4px 20px 12px;display:block;font-family:'Roboto',sans-serif;}
 
 /* Google G SVG */
 .g-logo{width:38px;height:38px;}
@@ -283,89 +372,360 @@ body{font-family:'Roboto',sans-serif;background:#f1f3f4;height:100vh;overflow:hi
       </div>
     </div>
 
-    <!-- ════════════════════════════════
-         NEW FILTER PANEL — RisFilters.html
-         Showing all 3 states mixed:
-         • chip (selected)
-         • open (active accordion)
-         • default
-    ════════════════════════════════ -->
     <div class="filter-panel">
       <div class="fp-head">
         <span class="fp-title">Filter by</span>
         <div class="fp-head-right">
-          <span class="fp-clear">Clear</span>
-          <span class="fp-cbadge">3</span>
+          <span class="fp-clear" id="fp-clear-all" role="button" tabindex="0">Clear all</span>
+          <span class="fp-cbadge" id="fp-filter-badge" aria-live="polite">0</span>
         </div>
       </div>
       <div class="fp-search">
         <svg viewBox="0 0 18 18"><circle cx="8" cy="8" r="5.5"/><line x1="12.5" y1="12.5" x2="16" y2="16"/></svg>
         <span>Search</span>
       </div>
-      <div class="fp-list">
-
-        <!-- chip -->
-        <div class="fr chip">
-          <div class="fr-hd">
-            <div class="fr-body-col">
-              <span class="fr-float-label">Groups</span>
-              <span class="fr-lbl">All groups</span>
-            </div>
-            <div class="chip-x"><svg viewBox="0 0 11 11"><line x1="1.5" y1="1.5" x2="9.5" y2="9.5"/><line x1="9.5" y1="1.5" x2="1.5" y2="9.5"/></svg></div>
-          </div>
-        </div>
-
-        <!-- default -->
-        <div class="fr"><div class="fr-hd"><span class="fr-lbl">Location</span><div class="fr-chv"><svg viewBox="0 0 16 16"><polyline points="3 6 8 11 13 6"/></svg></div></div></div>
-
-        <!-- chip -->
-        <div class="fr chip">
-          <div class="fr-hd">
-            <div class="fr-body-col">
-              <span class="fr-float-label">City</span>
-              <span class="fr-lbl">San Francisco, CA</span>
-            </div>
-            <div class="chip-x"><svg viewBox="0 0 11 11"><line x1="1.5" y1="1.5" x2="9.5" y2="9.5"/><line x1="9.5" y1="1.5" x2="1.5" y2="9.5"/></svg></div>
-          </div>
-        </div>
-
-        <!-- OPEN with checkboxes -->
-        <div class="fr open">
-          <div class="fr-hd">
-            <span class="fr-lbl">State</span>
-            <div class="fr-chv"><svg viewBox="0 0 16 16"><polyline points="3 6 8 11 13 6"/></svg></div>
-          </div>
-          <div class="fr-body">
-            <div class="fr-dd-search">
-              <svg viewBox="0 0 16 16"><circle cx="7" cy="7" r="4.5"/><line x1="10.5" y1="10.5" x2="14" y2="14"/></svg>
-              <span>Search</span>
-            </div>
-            <div class="cb-list">
-              <div class="cb-row"><div class="cb on"><svg viewBox="0 0 9 9"><polyline points="1 4.5 3.5 7 8 2"/></svg></div><span class="cb-lbl">CA</span></div>
-              <div class="cb-row"><div class="cb on"><svg viewBox="0 0 9 9"><polyline points="1 4.5 3.5 7 8 2"/></svg></div><span class="cb-lbl">TX</span></div>
-              <div class="cb-row"><div class="cb"></div><span class="cb-lbl">NY</span></div>
-              <div class="cb-row"><div class="cb"></div><span class="cb-lbl">FL</span></div>
-              <div class="cb-row"><div class="cb"></div><span class="cb-lbl">WA</span></div>
-            </div>
-            <div class="fr-foot"><button class="apply-btn">Apply</button></div>
-          </div>
-        </div>
-
-        <!-- defaults -->
-        <div class="fr"><div class="fr-hd"><span class="fr-lbl">Division</span><div class="fr-chv"><svg viewBox="0 0 16 16"><polyline points="3 6 8 11 13 6"/></svg></div></div></div>
-        <div class="fr"><div class="fr-hd"><span class="fr-lbl">Region manager</span><div class="fr-chv"><svg viewBox="0 0 16 16"><polyline points="3 6 8 11 13 6"/></svg></div></div></div>
-        <div class="fr"><div class="fr-hd"><span class="fr-lbl">Ratings</span><div class="fr-chv"><svg viewBox="0 0 16 16"><polyline points="3 6 8 11 13 6"/></svg></div></div></div>
-        <div class="fr"><div class="fr-hd"><span class="fr-lbl">Actions</span><div class="fr-chv"><svg viewBox="0 0 16 16"><polyline points="3 6 8 11 13 6"/></svg></div></div></div>
-        <div class="fr"><div class="fr-hd"><span class="fr-lbl">Status</span><div class="fr-chv"><svg viewBox="0 0 16 16"><polyline points="3 6 8 11 13 6"/></svg></div></div></div>
-        <div class="fr"><div class="fr-hd"><span class="fr-lbl">Tags</span><div class="fr-chv"><svg viewBox="0 0 16 16"><polyline points="3 6 8 11 13 6"/></svg></div></div></div>
-        <div class="fr"><div class="fr-hd"><span class="fr-lbl">Assisted by</span><div class="fr-chv"><svg viewBox="0 0 16 16"><polyline points="3 6 8 11 13 6"/></svg></div></div></div>
-        <div class="fr"><div class="fr-hd"><span class="fr-lbl">Review sentiment</span><div class="fr-chv"><svg viewBox="0 0 16 16"><polyline points="3 6 8 11 13 6"/></svg></div></div></div>
-
-      </div>
+      <div class="fp-list" id="fp-filter-list"></div>
       <a class="fp-see-all">Advanced filters</a>
     </div>
   </div>
 </div>
+
+<script>
+(function () {
+  var FILTER_DATA = {
+    region: ['Northeast', 'Southeast', 'Midwest', 'Southwest', 'West Coast'],
+    division: ['North America', 'EMEA', 'APAC', 'LATAM'],
+    city: ['San Francisco CA', 'Austin TX', 'New York NY', 'Chicago IL', 'Miami FL'],
+    zip: ['94105', '78701', '10001', '60601', '33101'],
+    content_manager: ['Priya Sharma', 'Akshat Jain', 'Aryan Kapoor', 'Abha Singh'],
+    social_manager: ['Rishabh Piplani', 'Debayan Debnath', 'Priyanka Mayanale'],
+    area_code: ['415', '512', '212', '312', '305'],
+    region_manager: ['Sampada Kulkarni', 'Rahul Mehta', 'Sarah Chen'],
+    location: [
+      'Downtown Seattle — Pike Place Hub',
+      'Chicago Loop — Willis Tower Office',
+      'Austin Domain — Tech Ridge Plaza',
+      'Miami Brickell — Financial District',
+      'Denver LoDo — Union Station Retail',
+      'Boston Back Bay — Newbury Street',
+      'Phoenix Scottsdale — Kierland Commons',
+      'Atlanta Midtown — Peachtree Center'
+    ],
+    status: ['Active', 'Demo', 'Inactive']
+  };
+
+  var FILTER_ORDER = [
+    { id: 'region', label: 'Region' },
+    { id: 'division', label: 'Division' },
+    { id: 'city', label: 'City' },
+    { id: 'zip', label: 'Zip' },
+    { id: 'content_manager', label: 'Content manager' },
+    { id: 'social_manager', label: 'Social manager' },
+    { id: 'area_code', label: 'Area code' },
+    { id: 'region_manager', label: 'Region manager' },
+    { id: 'location', label: 'Location' },
+    { id: 'status', label: 'Status' }
+  ];
+
+  function initFilters() {
+    var listEl = document.getElementById('fp-filter-list');
+    var badgeEl = document.getElementById('fp-filter-badge');
+    var clearAllEl = document.getElementById('fp-clear-all');
+    if (!listEl || !badgeEl || !clearAllEl) return;
+
+    var state = {
+      applied: {},
+      pending: {},
+      openId: null,
+      locQuery: {}
+    };
+
+    function getAppliedSet(id) {
+      var v = state.applied[id];
+      return v && v.length ? v.slice() : [];
+    }
+
+    function getPendingSet(id) {
+      if (state.openId === id && state.pending[id]) return state.pending[id].slice();
+      return getAppliedSet(id);
+    }
+
+    function formatSummary(values) {
+      if (!values || !values.length) return '';
+      return values.join(', ');
+    }
+
+    function countActiveFilters() {
+      var n = 0;
+      for (var i = 0; i < FILTER_ORDER.length; i++) {
+        var id = FILTER_ORDER[i].id;
+        if (getAppliedSet(id).length) n++;
+      }
+      return n;
+    }
+
+    function updateBadge() {
+      var n = countActiveFilters();
+      badgeEl.textContent = String(n);
+      if (n > 0) badgeEl.classList.add('is-visible');
+      else badgeEl.classList.remove('is-visible');
+    }
+
+    function closeDropdown() {
+      state.openId = null;
+      state.pending = {};
+    }
+
+    function openDropdown(id) {
+      if (state.openId === id) {
+        closeDropdown();
+        return;
+      }
+      state.pending = {};
+      state.openId = id;
+      state.pending[id] = getAppliedSet(id).slice();
+      if (id === 'location' && state.locQuery[id] === undefined) state.locQuery[id] = '';
+    }
+
+    function renderFieldUi(ff) {
+      var id = ff.dataset.filterId;
+      var applied = getAppliedSet(id);
+      var isOpen = state.openId === id;
+      var pending = getPendingSet(id);
+      var label = ff.dataset.label;
+
+      ff.classList.toggle('ff-open', isOpen);
+      ff.classList.toggle('ff-filled', applied.length > 0);
+
+      var floatEl = ff.querySelector('.ff-float');
+      var restEl = ff.querySelector('.ff-rest');
+      var valEl = ff.querySelector('.ff-value');
+      floatEl.textContent = label;
+      restEl.textContent = label;
+      valEl.textContent = formatSummary(applied);
+
+      var rows = ff.querySelectorAll('.cb-row');
+      for (var r = 0; r < rows.length; r++) {
+        var row = rows[r];
+        var opt = row.dataset.option;
+        var on = pending.indexOf(opt) !== -1;
+        row.classList.toggle('is-checked', on);
+        var cb = row.querySelector('.cb');
+        cb.classList.toggle('on', on);
+      }
+
+      var fieldBtn = ff.querySelector('.ff-field');
+      if (fieldBtn) fieldBtn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+
+      var locInput = ff.querySelector('.ff-loc-search input');
+      if (locInput && id === 'location') {
+        var q = (state.locQuery[id] || '').toLowerCase();
+        for (var j = 0; j < rows.length; j++) {
+          var rw = rows[j];
+          var text = (rw.dataset.option || '').toLowerCase();
+          rw.style.display = !q || text.indexOf(q) !== -1 ? '' : 'none';
+        }
+      }
+    }
+
+    function renderAll() {
+      var nodes = listEl.querySelectorAll('.ff');
+      for (var i = 0; i < nodes.length; i++) renderFieldUi(nodes[i]);
+      updateBadge();
+    }
+
+    function buildDom() {
+      listEl.innerHTML = '';
+      var chevronSvg = '<svg viewBox="0 0 16 16"><polyline points="3 6 8 11 13 6"/></svg>';
+      var checkSvg = '<svg viewBox="0 0 10 10"><polyline points="1 5 4 8 9 2"/></svg>';
+
+      for (var i = 0; i < FILTER_ORDER.length; i++) {
+        var def = FILTER_ORDER[i];
+        var id = def.id;
+        var options = FILTER_DATA[id] || [];
+
+        var ff = document.createElement('div');
+        ff.className = 'ff';
+        ff.dataset.filterId = id;
+        ff.dataset.label = def.label;
+        if (id === 'location') ff.dataset.hasLocSearch = '1';
+
+        var field = document.createElement('div');
+        field.className = 'ff-field';
+        field.setAttribute('role', 'button');
+        field.setAttribute('tabindex', '0');
+        field.setAttribute('aria-expanded', 'false');
+
+        var inner = document.createElement('div');
+        inner.className = 'ff-inner';
+        inner.innerHTML =
+          '<span class="ff-float"></span>' +
+          '<span class="ff-rest"></span>' +
+          '<span class="ff-value"></span>';
+        field.appendChild(inner);
+
+        var clearBtn = document.createElement('button');
+        clearBtn.type = 'button';
+        clearBtn.className = 'ff-clear';
+        clearBtn.setAttribute('aria-label', 'Clear ' + def.label);
+        clearBtn.innerHTML = '<svg viewBox="0 0 12 12"><line x1="2" y1="2" x2="10" y2="10"/><line x1="10" y1="2" x2="2" y2="10"/></svg>';
+        field.appendChild(clearBtn);
+
+        var chv = document.createElement('span');
+        chv.className = 'ff-chv';
+        chv.innerHTML = chevronSvg;
+        field.appendChild(chv);
+
+        ff.appendChild(field);
+
+        var drop = document.createElement('div');
+        drop.className = 'ff-drop';
+
+        if (id === 'location') {
+          var sw = document.createElement('div');
+          sw.className = 'ff-loc-search-wrap';
+          sw.innerHTML =
+            '<div class="ff-loc-search">' +
+            '<svg viewBox="0 0 18 18"><circle cx="8" cy="8" r="5.5"/><line x1="12.5" y1="12.5" x2="16" y2="16"/></svg>' +
+            '<input type="search" placeholder="Search locations" autocomplete="off" aria-label="Search locations"/>' +
+            '</div>';
+          drop.appendChild(sw);
+        }
+
+        var cbList = document.createElement('div');
+        cbList.className = 'cb-list';
+        for (var o = 0; o < options.length; o++) {
+          var opt = options[o];
+          var row = document.createElement('div');
+          row.className = 'cb-row';
+          row.dataset.option = opt;
+          row.innerHTML =
+            '<div class="cb">' + checkSvg + '</div>' +
+            '<span class="cb-lbl"></span>';
+          row.querySelector('.cb-lbl').textContent = opt;
+          cbList.appendChild(row);
+        }
+        drop.appendChild(cbList);
+
+        var foot = document.createElement('div');
+        foot.className = 'ff-foot';
+        var applyBtn = document.createElement('button');
+        applyBtn.type = 'button';
+        applyBtn.className = 'apply-btn';
+        applyBtn.textContent = 'Apply';
+        foot.appendChild(applyBtn);
+        drop.appendChild(foot);
+
+        ff.appendChild(drop);
+        listEl.appendChild(ff);
+
+        (function (fid, ffield, fapply, flocInput, fclear) {
+          ffield.addEventListener('click', function (e) {
+            if (e.target.closest('.ff-clear')) return;
+            openDropdown(fid);
+            renderAll();
+          });
+
+          ffield.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              if (e.target.closest && e.target.closest('.ff-clear')) return;
+              openDropdown(fid);
+              renderAll();
+            }
+          });
+
+          fclear.addEventListener('click', function (e) {
+            e.stopPropagation();
+            state.applied[fid] = [];
+            if (state.openId === fid) state.pending[fid] = [];
+            closeDropdown();
+            renderAll();
+          });
+
+          cbList.addEventListener('click', function (e) {
+            var row = e.target.closest('.cb-row');
+            if (!row || state.openId !== fid) return;
+            e.stopPropagation();
+            var opt = row.dataset.option;
+            var set = state.pending[fid] || [];
+            var idx = set.indexOf(opt);
+            if (idx === -1) set.push(opt);
+            else set.splice(idx, 1);
+            state.pending[fid] = set;
+            renderFieldUi(row.closest('.ff'));
+          });
+
+          if (flocInput) {
+            flocInput.addEventListener('input', function () {
+              state.locQuery[fid] = flocInput.value;
+              renderFieldUi(flocInput.closest('.ff'));
+            });
+            flocInput.addEventListener('click', function (e) {
+              e.stopPropagation();
+            });
+            flocInput.addEventListener('keydown', function (e) {
+              e.stopPropagation();
+            });
+          }
+
+          fapply.addEventListener('click', function (e) {
+            e.stopPropagation();
+            if (state.openId !== fid) return;
+            state.applied[fid] = (state.pending[fid] || []).slice();
+            closeDropdown();
+            renderAll();
+          });
+        })(id, field, applyBtn, ff.querySelector('.ff-loc-search input'), clearBtn);
+      }
+    }
+
+    document.addEventListener('click', function (e) {
+      if (!e.target.closest('.filter-panel')) return;
+      if (e.target.closest('.ff-field') || e.target.closest('.ff-drop')) return;
+      if (state.openId) {
+        closeDropdown();
+        renderAll();
+      }
+    });
+
+    document.addEventListener('click', function (e) {
+      if (e.target.closest('.filter-panel')) return;
+      if (state.openId) {
+        closeDropdown();
+        renderAll();
+      }
+    });
+
+    clearAllEl.addEventListener('click', function () {
+      for (var i = 0; i < FILTER_ORDER.length; i++) {
+        state.applied[FILTER_ORDER[i].id] = [];
+      }
+      state.locQuery = {};
+      closeDropdown();
+      var inputs = listEl.querySelectorAll('.ff-loc-search input');
+      for (var j = 0; j < inputs.length; j++) inputs[j].value = '';
+      renderAll();
+    });
+
+    clearAllEl.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        clearAllEl.click();
+      }
+    });
+
+    buildDom();
+    renderAll();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initFilters);
+  } else {
+    initFilters();
+  }
+})();
+</script>
 
 </body>
 </html>
